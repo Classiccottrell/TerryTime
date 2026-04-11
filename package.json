@@ -4,8 +4,8 @@
   "description": "Backend API for TerryTime Stripe and Printful integrations.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node server/server.js",
+    "dev": "node server/server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
