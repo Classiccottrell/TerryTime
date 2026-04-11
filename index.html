@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terry Terry Larry Berry</title>
+  
+  <!-- Fonts Setup based on Design System -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Text:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;700&family=Space+Mono&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Dynamic Sticker Tape Header -->
+  <div class="ticker-tape">
+    <div class="ticker-content">
+      <span>IT'S TERRY TIME / ONE STICKER. INFINITE HUSTLE. / GET RICH QUICK / OR DON'T / WE DON'T CARE / #EASTVAN</span>
+      <span>IT'S TERRY TIME / ONE STICKER. INFINITE HUSTLE. / GET RICH QUICK / OR DON'T / WE DON'T CARE / #EASTVAN</span>
+      <span>IT'S TERRY TIME / ONE STICKER. INFINITE HUSTLE. / GET RICH QUICK / OR DON'T / WE DON'T CARE / #EASTVAN</span>
+    </div>
+  </div>
+
+  <main>
+    <!-- HERO SECTION -->
+    <header class="hero">
+      <div class="hero-content sketcher-theme">
+        <h1>TERRY TERRY LARRY BERRY</h1>
+        <p class="subtitle">An East Van Art Collective Masquerading as a Sticker Brand.</p>
+        <button class="cta-button" onclick="document.getElementById('shop-section').scrollIntoView({behavior: 'smooth'})">ENTER THE STUDIO</button>
+      </div>
+    </header>
+
+    <div class="divider"></div>
+
+    <!-- THE STORY / CHARACTER BITS -->
+    <section class="story-section">
+      
+      <!-- Terry 1: The Sketcher -->
+      <article class="character-card sketcher-card scroll-reveal">
+        <h2 class="char-name">TERRY <span class="muted">(The Sketcher)</span></h2>
+        <p class="char-bio">Obsessive. Line work. Never finishes. He looks at the void and sees the light.</p>
+        <div class="quote-block">
+          "Draw it wrong. Draw it again. Eventually you're drawing what it actually is."
+        </div>
+      </article>
+
+      <!-- Terry 2: The Philosopher -->
+      <article class="character-card philosopher-card scroll-reveal">
+        <h2 class="char-name">TERRY <span class="muted">(The Philosopher)</span></h2>
+        <p class="char-bio">Terry is always 2. Duality. Silence. Asks questions instead of answering.</p>
+        <div class="quote-block">
+          "See it twice. The way it is and the way you imagined it."
+        </div>
+      </article>
+
+      <!-- Larry: The Documentarian -->
+      <article class="character-card documentarian-card scroll-reveal">
+        <h2 class="char-name">LARRY <span class="muted">(The Documentarian)</span></h2>
+        <p class="char-bio">Clever lad. Sharp eye. Street photography. Captures the real Vancouver.</p>
+        <div class="quote-block">
+          "The best moment is the one you almost missed."
+        </div>
+      </article>
+
+      <!-- Berry: The Editor -->
+      <article class="character-card editor-card scroll-reveal">
+        <h2 class="char-name">BERRY <span class="muted">(The Editor)</span></h2>
+        <p class="char-bio">Thinks it's all too much. The filter. The one who says no.</p>
+        <div class="quote-block">
+          "If it feels done, it's lying."
+        </div>
+      </article>
+
+    </section>
+
+    <!-- SHOP / FILES SECTION -->
+    <section id="shop-section" class="shop">
+      <h2 class="shop-title">THE GOODS</h2>
+      
+      <div class="shop-grid">
+        
+        <!-- FREE DROP -->
+        <div class="product-card free-drop scroll-reveal">
+          <div class="product-image placeholder-img">STICKER PREVIEW</div>
+          <h3>RAW LINE STICKER SVG</h3>
+          <p>Royalty-free. Die-cut ready.</p>
+          <div class="price">FREE</div>
+          <button class="cta-button" id="btn-download-free">DOWNLOAD .SVG</button>
+        </div>
+
+        <!-- PREMIUM (PHYSICAL) -->
+        <div class="product-card premium scroll-reveal">
+          <div class="product-image placeholder-img">PHYSICAL PACK</div>
+          <h3>"SEE IT TWICE" PACK</h3>
+          <p>3 Vancouver street slaps. Printed and shipped to your door.</p>
+          <div class="price">$15.00</div>
+          <button class="cta-button" onclick="startCheckout('pack1', 'physical', 15)">BUY PHYSICAL PACK</button>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>#EASTVAN - TERRY TERRY LARRY BERRY - THE VOID LISTENS</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  <script src="js/checkout.js"></script>
+</body>
+</html>
