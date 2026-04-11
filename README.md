@@ -16,9 +16,10 @@ To test the site immediately, use the Python test instructions below. If you wan
 Because your Mac already has Python 3 installed, you can launch a local web server to test the site immediately. 
 
 1. Open your terminal.
-2. Navigate to the `client` folder inside this repository:
+2. Clone this repository and navigate into it:
    ```bash
-   cd /Users/mattcottrell/Documents/GitHub/TerryTime
+   git clone https://github.com/Classiccottrell/TerryTime.git
+   cd TerryTime
    ```
 3. Run the following command:
    ```bash
