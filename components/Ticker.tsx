@@ -3,8 +3,8 @@ const PHRASE =
 
 export function Ticker() {
   return (
-    <div className="bg-yellow text-ink overflow-hidden border-b-2 border-ink select-none">
-      <div className="flex whitespace-nowrap animate-ticker font-[family-name:var(--font-spacemono)] text-xs font-bold tracking-widest py-1.5">
+    <div className="bg-ink text-yellow overflow-hidden select-none border-b border-ink">
+      <div className="flex whitespace-nowrap animate-ticker font-[family-name:var(--font-spacemono)] text-xs font-bold tracking-[0.2em] py-2">
         <span className="px-4">{PHRASE.repeat(4)}</span>
         <span className="px-4" aria-hidden="true">
           {PHRASE.repeat(4)}

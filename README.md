@@ -79,17 +79,37 @@ the four character voices, and the community strategy. The site's colors, type, 
 components all derive from it. When extending the site, read those files first so new pages
 stay in voice.
 
-## Design System (at a glance)
+## Design System — Editorial v2
 
-| Voice | Primary | Accent |
+The theme is a deliberate mash-up of three art publications, mapped onto Terry's
+four-voice brand. The tokens live in `app/globals.css` (`@theme`).
+
+| Influence | What we took |
+| --- | --- |
+| **Colossal** | Warm paper canvas, gallery whitespace, hairline rules, image-worship cards |
+| **It's Nice That** | Oversized confident headlines, electric accent, strong modular grid |
+| **Juxtapoz** | High-contrast ink blocks, underground/punk edge, zero rounded corners |
+
+**Canvas alternation** — pages breathe on warm paper (`--color-paper #f3efe4`) and
+punch into near-black ink blocks (`--color-ink #141312`) for emphasis.
+
+**Accents** keep the four-voice system: electric yellow `#FFE135` (the pop), red
+`#E0301E`, forest `#1F6F43`, charcoal `#2C2C2C`. The gradient "shouting match"
+divider still ties sections together.
+
+**Type roles**
+
+| Token | Face | Used for |
 | --- | --- | --- |
-| Terry — Sketcher | `#1A1A1A` | `#FFE135` electric yellow |
-| Terry — Philosopher | `#2C2C2C` | `#808080` gray |
-| Larry — Documentarian | `#0F0F0F` | `#CC0000` documentary red |
-| Berry — Editor | `#3D3D3D` | `#2D5F2E` forest green |
+| `--font-display` | Bebas Neue | Huge brand statements, character names, ticker |
+| `--font-grotesk` | Space Grotesk | Editorial headlines, nav, buttons |
+| `--font-serif` | Crimson Text | Long-form body |
+| `--font-mono` | IBM Plex Mono | Category eyebrows, meta labels |
+| `--font-spacemono` | Space Mono | Ticker fine print |
 
-Sharp corners, an 8px spacing grid, restrained motion, and the gradient "shouting match"
-divider tie it together.
+Sharp corners, an 8px spacing grid, mono category eyebrows, and restrained
+scroll-reveal motion complete the system. Reusable utilities: `.ed-card`,
+`.eyebrow`, `.rule` / `.rule-ink`, `.divider-line`, `.grain` / `.grain-ink`.
 
 ## Deploy
 

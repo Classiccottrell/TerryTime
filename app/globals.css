@@ -1,39 +1,42 @@
 @import "tailwindcss";
 
 /*
-  Terry Terry Larry Berry — Design System
-  Four voices that must blend, never reduce.
-  Tokens sourced from .agents/skills/SKILL-TERRY-DESIGN-SYSTEM.md
+  Terry Terry Larry Berry — Editorial Design System v2
+  A mash-up of three art publications:
+    · Colossal      — gallery whitespace, paper canvas, hairline rules, image worship
+    · It's Nice That — oversized confident type, electric accent, modular grid
+    · Juxtapoz       — high-contrast ink blocks, underground/punk edge, no soft corners
+  Kept from the brand: the four-voice colour system + the punk ticker.
+  Foundations sourced from .agents/skills/SKILL-TERRY-DESIGN-SYSTEM.md
 */
 
 @theme {
-  /* Sketcher */
-  --color-ink: #1a1a1a;
-  --color-yellow: #ffe135;
-  --color-offwhite: #f5f5f5;
+  /* ---- Canvas + ink (the editorial alternation) ---- */
+  --color-paper: #f3efe4;   /* warm gallery paper — default canvas */
+  --color-cloud: #fbf9f2;   /* lifted paper, for cards */
+  --color-ink: #141312;     /* near-black — text + high-contrast blocks */
+  --color-soot: #1d1b19;    /* slightly lifted ink, for ink-section cards */
 
-  /* Philosopher */
-  --color-charcoal: #2c2c2c;
-  --color-gray: #808080;
+  /* ---- Muted greys (paper / ink contexts) ---- */
+  --color-stone: #6b665c;   /* muted text on paper */
+  --color-smoke: #9a9488;   /* muted text on ink */
+  --color-line: #d8d2c4;    /* hairline rule on paper */
+  --color-lineink: #34312c; /* hairline rule on ink */
 
-  /* Larry / Documentarian */
-  --color-trueblack: #0f0f0f;
-  --color-red: #cc0000;
-  --color-newsprint: #e8e8e8;
+  /* ---- Electric accents (the four voices) ---- */
+  --color-yellow: #ffe135;  /* Sketcher — the primary pop */
+  --color-red: #e0301e;     /* Larry — documentary red, brightened */
+  --color-forest: #1f6f43;  /* Berry — forest green, brightened */
+  --color-charcoal: #2c2c2c;/* Philosopher */
 
-  /* Berry / Editor */
-  --color-mediumdark: #3d3d3d;
-  --color-forest: #2d5f2e;
-  --color-bone: #fafafa;
+  /* ---- Type ---- */
+  --font-display: var(--font-bebas), "Arial Narrow", sans-serif;     /* huge brand statements */
+  --font-grotesk: var(--font-grotesk-src), "Helvetica Neue", sans-serif; /* editorial heads, UI */
+  --font-serif: var(--font-crimson), Georgia, serif;                /* long-form body */
+  --font-mono: var(--font-plex), ui-monospace, monospace;           /* category labels, meta */
+  --font-spacemono: var(--font-space), ui-monospace, monospace;     /* ticker fine print */
 
-  /* Type — backed by next/font variables, with system fallbacks */
-  --font-display: var(--font-bebas), "Arial Narrow", sans-serif;
-  --font-mono: var(--font-plex), ui-monospace, monospace;
-  --font-serif: var(--font-crimson), Georgia, serif;
-  --font-spacemono: var(--font-space), ui-monospace, monospace;
-
-  /* Sharp corners by default — raw aesthetic */
-  --radius: 0px;
+  --radius: 0px; /* sharp corners — raw aesthetic */
 }
 
 @layer base {
@@ -42,8 +45,8 @@
   }
 
   body {
-    background-color: var(--color-trueblack);
-    color: var(--color-offwhite);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
     font-family: var(--font-serif);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -54,60 +57,92 @@
     color: var(--color-ink);
   }
 
-  /* Bright yellow focus ring on all interactive elements (a11y) */
   a:focus-visible,
   button:focus-visible,
   input:focus-visible,
   [tabindex]:focus-visible {
-    outline: 2px solid var(--color-yellow);
+    outline: 2px solid var(--color-ink);
     outline-offset: 3px;
   }
 
+  /* Headlines default to the editorial grotesk; brand moments opt into display. */
   h1, h2, h3 {
-    font-family: var(--font-display);
-    letter-spacing: 0.06em;
-    line-height: 0.95;
+    font-family: var(--font-grotesk);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 0.98;
   }
 }
 
-/* ---- Ticker tape ---- */
+/* ---- Editorial eyebrow (mono category label) ---- */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+}
+
+/* ---- Hairline rules ---- */
+.rule { height: 1px; background: var(--color-line); }
+.rule-ink { height: 1px; background: var(--color-lineink); }
+
+/* ---- The gradient "shouting match" — punk accent bar ---- */
+.divider-line {
+  height: 3px;
+  background: linear-gradient(90deg, #141312 0%, #ffe135 35%, #e0301e 70%, #1f6f43 100%);
+}
+
+/* ---- Editorial card: image worship + hairline + hover lift ---- */
+.ed-card {
+  position: relative;
+  background: var(--color-cloud);
+  border: 1px solid var(--color-line);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.25s ease;
+}
+.ed-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 8px 8px 0 0 var(--color-ink);
+}
+.ed-card__media {
+  overflow: hidden;
+}
+.ed-card__media > * {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ed-card:hover .ed-card__media > * {
+  transform: scale(1.04);
+}
+
+/* ---- Ticker tape (the underground signature) ---- */
 @keyframes ticker {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-.animate-ticker {
-  animation: ticker 30s linear infinite;
-}
+.animate-ticker { animation: ticker 32s linear infinite; }
 
 /* ---- Scroll reveal ---- */
 @keyframes reveal {
   from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.reveal {
-  animation: reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
+.reveal { animation: reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
-/* ---- Gradient divider (the visual shouting match) ---- */
-.divider-line {
-  height: 2px;
-  background: linear-gradient(90deg, #1a1a1a 0%, #ffe135 35%, #cc0000 70%, #2d5f2e 100%);
-}
-
-/* ---- Sketch grain texture overlay ---- */
+/* ---- Paper grain (subtle newsprint texture) ---- */
 .grain::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.06;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+/* On ink sections the grain lightens instead of darkens. */
+.grain-ink::before { mix-blend-mode: screen; opacity: 0.05; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-ticker,
-  .reveal {
-    animation: none;
-  }
+  .animate-ticker, .reveal,
+  .ed-card, .ed-card__media > * { animation: none; transition: none; }
   html { scroll-behavior: auto; }
 }

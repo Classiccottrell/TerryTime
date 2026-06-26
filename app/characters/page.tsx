@@ -11,15 +11,13 @@ export const metadata: Metadata = {
 
 export default function CharactersPage() {
   return (
-    <div className="mx-auto max-w-[1440px] px-6 py-16">
-      <header className="max-w-2xl">
-        <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.3em] text-yellow">
-          The Collective
-        </p>
-        <h1 className="mt-3 font-[family-name:var(--font-display)] text-6xl sm:text-7xl text-offwhite">
+    <div className="mx-auto max-w-[1600px] px-6 sm:px-8 py-16">
+      <header className="border-t-2 border-ink pt-6 max-w-3xl">
+        <p className="eyebrow text-stone">The Collective</p>
+        <h1 className="mt-4 font-[family-name:var(--font-display)] text-6xl sm:text-8xl tracking-tight leading-[0.85] text-ink">
           A fractured psyche, in four parts.
         </h1>
-        <p className="mt-5 font-[family-name:var(--font-serif)] text-xl text-newsprint">
+        <p className="mt-6 font-[family-name:var(--font-serif)] text-xl text-ink/80">
           The brand exists in four distinct voices. They argue. They overrule each other.
           Together they make the work. Never design for one alone.
         </p>

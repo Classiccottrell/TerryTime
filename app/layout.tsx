@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Crimson_Text, IBM_Plex_Mono, Space_Mono } from "next/font/google";
+import {
+  Bebas_Neue,
+  Crimson_Text,
+  IBM_Plex_Mono,
+  Space_Mono,
+  Space_Grotesk,
+} from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
@@ -34,6 +40,13 @@ const spaceMono = Space_Mono({
   display: "swap",
 });
 
+const spaceGrotesk = Space_Grotesk({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-grotesk-src",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://terryterrylarryberry.com"),
   title: {
@@ -63,7 +76,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bebas.variable} ${crimson.variable} ${plexMono.variable} ${spaceMono.variable}`}
+      className={`${bebas.variable} ${crimson.variable} ${plexMono.variable} ${spaceMono.variable} ${spaceGrotesk.variable}`}
     >
       <head>
         {/* No-JS fallback: reveal-animated content must never stay hidden */}

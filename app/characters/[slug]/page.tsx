@@ -16,10 +16,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const c = getCharacter(slug);
   if (!c) return { title: "Not found" };
-  return {
-    title: `${c.name} — ${c.role}`,
-    description: c.bio,
-  };
+  return { title: `${c.name} — ${c.role}`, description: c.bio };
 }
 
 export default async function CharacterPage({
@@ -36,60 +33,51 @@ export default async function CharacterPage({
 
   return (
     <article>
-      {/* Hero band tinted to the character */}
+      {/* Hero — full colour block in the character's primary */}
       <header
-        className="grain relative border-b border-mediumdark"
-        style={{ background: `linear-gradient(135deg, ${c.primary} 0%, #0f0f0f 100%)` }}
+        className="grain grain-ink relative border-b border-ink text-paper"
+        style={{ background: c.primary }}
       >
-        <div className="relative mx-auto max-w-[1440px] px-6 py-20">
+        <div className="relative mx-auto max-w-[1600px] px-6 sm:px-8 py-16 sm:py-20">
           <Link
             href="/characters"
-            className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-widest text-newsprint hover:text-yellow"
+            className="font-[family-name:var(--font-grotesk)] text-xs font-bold uppercase tracking-widest text-paper/80 hover:text-paper"
           >
             ← The Four
           </Link>
-          <p
-            className="mt-8 font-[family-name:var(--font-mono)] text-sm uppercase tracking-[0.3em]"
-            style={{ color: c.accent }}
-          >
+          <p className="eyebrow mt-10" style={{ color: c.accent }}>
             {c.role}
           </p>
-          <h1 className="font-[family-name:var(--font-display)] text-7xl sm:text-9xl text-offwhite leading-none">
+          <h1 className="font-[family-name:var(--font-display)] text-7xl sm:text-[11rem] leading-[0.8] tracking-tight">
             {c.name}
           </h1>
-          <p className="mt-4 max-w-xl font-[family-name:var(--font-mono)] text-lg italic text-newsprint">
+          <p className="mt-5 max-w-xl font-[family-name:var(--font-serif)] text-xl italic text-paper/90">
             “{c.tagline}”
           </p>
         </div>
       </header>
 
-      <div className="mx-auto max-w-4xl px-6 py-16 grid gap-14">
+      <div className="mx-auto max-w-4xl px-6 sm:px-8 py-16 grid gap-14">
         {/* Bio */}
         <Reveal>
-          <section>
-            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.3em] text-gray mb-4">
-              Who
-            </p>
-            <p className="font-[family-name:var(--font-serif)] text-2xl leading-relaxed text-offwhite">
+          <section className="border-t-2 border-ink pt-6">
+            <p className="eyebrow text-stone mb-4">Who</p>
+            <p className="font-[family-name:var(--font-serif)] text-2xl sm:text-3xl leading-snug text-ink">
               {c.bio}
             </p>
           </section>
         </Reveal>
 
-        <div className="divider-line" />
-
         {/* Voice + Themes */}
         <div className="grid gap-12 sm:grid-cols-2">
           <Reveal>
             <section>
-              <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.3em] text-gray mb-4">
-                Voice & Tone
-              </p>
+              <p className="eyebrow text-stone mb-4">Voice & Tone</p>
               <ul className="space-y-3">
                 {c.voice.map((v) => (
                   <li
                     key={v}
-                    className="font-[family-name:var(--font-serif)] text-lg text-newsprint pl-4"
+                    className="font-[family-name:var(--font-serif)] text-lg text-ink pl-4"
                     style={{ borderLeft: `3px solid ${c.accent}` }}
                   >
                     {v}
@@ -101,15 +89,12 @@ export default async function CharacterPage({
 
           <Reveal delay={120}>
             <section>
-              <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.3em] text-gray mb-4">
-                Content Themes
-              </p>
+              <p className="eyebrow text-stone mb-4">Content Themes</p>
               <ul className="flex flex-wrap gap-2">
                 {c.themes.map((t) => (
                   <li
                     key={t}
-                    className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-wide px-3 py-1.5 border"
-                    style={{ borderColor: c.accent, color: c.accent }}
+                    className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-wide px-3 py-1.5 border border-ink text-ink"
                   >
                     {t}
                   </li>
@@ -119,20 +104,18 @@ export default async function CharacterPage({
           </Reveal>
         </div>
 
-        <div className="divider-line" />
+        <div className="rule" />
 
         {/* Quotes */}
         <Reveal>
           <section>
-            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.3em] text-gray mb-6">
-              In their own words
-            </p>
+            <p className="eyebrow text-stone mb-6">In their own words</p>
             <div className="grid gap-4 sm:grid-cols-2">
               {c.quotes.map((q) => (
                 <blockquote
                   key={q}
-                  className="bg-ink p-5 font-[family-name:var(--font-mono)] text-sm font-bold leading-relaxed text-offwhite"
-                  style={{ borderLeft: `8px solid ${c.accent}` }}
+                  className="bg-cloud border border-line p-5 font-[family-name:var(--font-grotesk)] font-medium text-lg leading-snug text-ink"
+                  style={{ borderLeft: `6px solid ${c.accent}` }}
                 >
                   {q}
                 </blockquote>
@@ -144,19 +127,17 @@ export default async function CharacterPage({
         {/* Palette */}
         <Reveal>
           <section>
-            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.3em] text-gray mb-4">
-              Palette
-            </p>
+            <p className="eyebrow text-stone mb-4">Palette</p>
             <div className="flex flex-wrap gap-3">
               {[
                 { label: "Primary", hex: c.primary },
                 { label: "Accent", hex: c.accent },
                 { label: "Secondary", hex: c.secondary },
               ].map((s) => (
-                <div key={s.label} className="border border-mediumdark">
+                <div key={s.label} className="border border-line">
                   <div className="h-16 w-28" style={{ background: s.hex }} />
-                  <div className="px-3 py-2 font-[family-name:var(--font-spacemono)] text-xs text-newsprint">
-                    <div className="text-gray uppercase">{s.label}</div>
+                  <div className="px-3 py-2 font-[family-name:var(--font-spacemono)] text-xs text-ink bg-cloud">
+                    <div className="text-stone uppercase">{s.label}</div>
                     {s.hex}
                   </div>
                 </div>
@@ -169,19 +150,17 @@ export default async function CharacterPage({
       {/* Next character */}
       <Link
         href={`/characters/${next.slug}`}
-        className="group block border-t border-mediumdark"
-        style={{ background: `linear-gradient(135deg, #0f0f0f 0%, ${next.primary} 100%)` }}
+        className="group grain grain-ink relative block border-t border-ink text-paper"
+        style={{ background: next.primary }}
       >
-        <div className="mx-auto max-w-[1440px] px-6 py-12 flex items-center justify-between">
+        <div className="mx-auto max-w-[1600px] px-6 sm:px-8 py-14 flex items-center justify-between gap-4">
           <div>
-            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.3em] text-gray">
-              Next
-            </p>
-            <p className="font-[family-name:var(--font-display)] text-5xl text-offwhite group-hover:text-yellow transition-colors">
+            <p className="eyebrow text-paper/70">Next</p>
+            <p className="font-[family-name:var(--font-display)] text-5xl sm:text-7xl tracking-tight group-hover:opacity-80 transition-opacity">
               {next.name} — {next.role}
             </p>
           </div>
-          <span className="font-[family-name:var(--font-display)] text-5xl text-newsprint group-hover:translate-x-2 transition-transform">
+          <span className="font-[family-name:var(--font-display)] text-5xl sm:text-7xl group-hover:translate-x-2 transition-transform">
             →
           </span>
         </div>

@@ -7,69 +7,61 @@ import { Reveal } from "@/components/Reveal";
 export default function Home() {
   return (
     <>
-      {/* ---------- HERO ---------- */}
-      <section className="grain relative overflow-hidden border-b border-mediumdark">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(120% 90% at 50% 0%, #1a1a1a 0%, #0f0f0f 55%, #000 100%)",
-          }}
-        />
-        <div className="relative mx-auto max-w-[1440px] px-6 py-24 sm:py-32 text-center">
-          <p className="font-[family-name:var(--font-mono)] text-xs sm:text-sm uppercase tracking-[0.4em] text-yellow mb-6">
-            East Van · Underground · Since whenever
-          </p>
-          <h1 className="font-[family-name:var(--font-display)] text-6xl sm:text-8xl lg:text-[10rem] leading-[0.85] text-offwhite">
+      {/* ---------- HERO (paper / editorial) ---------- */}
+      <section className="grain relative border-b border-ink">
+        <div className="mx-auto max-w-[1600px] px-6 sm:px-8 pt-16 pb-12 sm:pt-24 sm:pb-16">
+          <div className="flex items-center gap-3 mb-8">
+            <span className="eyebrow text-stone">East Van</span>
+            <span className="h-px w-8 bg-ink" />
+            <span className="eyebrow text-stone">Underground</span>
+            <span className="h-px w-8 bg-ink" />
+            <span className="eyebrow text-stone">Est. whenever</span>
+          </div>
+
+          <h1 className="font-[family-name:var(--font-display)] tracking-tight leading-[0.82] text-ink text-[19vw] sm:text-[15vw] lg:text-[12.5rem]">
             TERRY TERRY
             <br />
-            <span className="text-yellow">LARRY</span> <span className="text-red">BERRY</span>
+            <span className="text-red">LARRY</span> <span className="text-forest">BERRY</span>
           </h1>
-          <p className="mx-auto mt-8 max-w-2xl font-[family-name:var(--font-serif)] text-xl sm:text-2xl text-newsprint">
-            An art collective masquerading as a sticker brand. Four voices, one fractured
-            psyche. The Sketcher draws. The Philosopher doubts. The Documentarian shoots.
-            The Editor says no.
-          </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link
-              href="/shop"
-              className="border-2 border-yellow bg-ink px-8 py-3 font-[family-name:var(--font-display)] text-lg tracking-widest text-yellow transition-colors hover:bg-yellow hover:text-ink"
-            >
-              ENTER THE STUDIO
-            </Link>
-            <Link
-              href="/characters"
-              className="border-2 border-newsprint px-8 py-3 font-[family-name:var(--font-display)] text-lg tracking-widest text-newsprint transition-colors hover:border-yellow hover:text-yellow"
-            >
-              MEET THE FOUR
-            </Link>
+
+          <div className="mt-10 grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-end">
+            <p className="max-w-2xl font-[family-name:var(--font-serif)] text-xl sm:text-2xl leading-snug text-ink">
+              An art collective masquerading as a sticker brand. Four voices, one fractured
+              psyche. The Sketcher draws. The Philosopher doubts. The Documentarian shoots.
+              The Editor says no.
+            </p>
+            <div className="flex flex-wrap gap-3 lg:justify-end">
+              <Link
+                href="/shop"
+                className="bg-ink text-paper px-7 py-3.5 font-[family-name:var(--font-grotesk)] text-sm font-bold uppercase tracking-widest hover:bg-red transition-colors"
+              >
+                Enter the Studio
+              </Link>
+              <Link
+                href="/characters"
+                className="border border-ink px-7 py-3.5 font-[family-name:var(--font-grotesk)] text-sm font-bold uppercase tracking-widest text-ink hover:bg-yellow transition-colors"
+              >
+                Meet the Four
+              </Link>
+            </div>
           </div>
         </div>
         <div className="divider-line" />
       </section>
 
-      {/* ---------- THE FOUR ---------- */}
-      <section className="mx-auto max-w-[1440px] px-6 py-20">
+      {/* ---------- THE FOUR (paper / editorial grid) ---------- */}
+      <section className="mx-auto max-w-[1600px] px-6 sm:px-8 py-20">
         <Reveal>
-          <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
-            <div>
-              <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.3em] text-gray">
-                01 — The Collective
-              </p>
-              <h2 className="mt-2 font-[family-name:var(--font-display)] text-5xl sm:text-6xl text-offwhite">
-                Four voices that <span className="text-yellow">blend</span>, never reduce.
-              </h2>
-            </div>
-            <Link
-              href="/characters"
-              className="font-[family-name:var(--font-mono)] text-sm uppercase tracking-widest text-newsprint hover:text-yellow"
-            >
-              All four →
-            </Link>
-          </div>
+          <SectionHead
+            number="01"
+            kicker="The Collective"
+            link={{ href: "/characters", label: "All four" }}
+          >
+            Four voices that <span className="text-red">blend</span>, never reduce.
+          </SectionHead>
         </Reveal>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {characters.map((c, i) => (
             <Reveal key={c.slug} delay={i * 80}>
               <CharacterCard c={c} />
@@ -78,99 +70,125 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------- MANIFESTO STRIP ---------- */}
-      <section className="border-y border-mediumdark bg-ink">
-        <div className="mx-auto max-w-4xl px-6 py-20 text-center">
+      {/* ---------- MANIFESTO (ink block / high contrast) ---------- */}
+      <section className="grain grain-ink relative bg-ink text-paper border-y border-ink">
+        <div className="mx-auto max-w-5xl px-6 sm:px-8 py-24 text-center">
           <Reveal>
-            <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.3em] text-red mb-6">
-              02 — The Idea
-            </p>
-            <blockquote className="font-[family-name:var(--font-serif)] text-2xl sm:text-3xl leading-snug text-offwhite">
-              “Community is embedded in the work itself. The stickers invite participation.
-              People add to them, remix them, make them part of their own practice.
-              <span className="text-yellow"> You're part of it now.</span>”
+            <p className="eyebrow text-yellow mb-8">02 — The Idea</p>
+            <blockquote className="font-[family-name:var(--font-grotesk)] font-medium text-3xl sm:text-5xl leading-[1.05] tracking-tight">
+              Community is embedded in the work itself. The stickers invite participation.
+              People add to them, remix them, make them their own.
+              <span className="text-yellow"> You're part of it now.</span>
             </blockquote>
             <Link
               href="/manifesto"
-              className="mt-8 inline-block font-[family-name:var(--font-display)] text-lg tracking-widest text-newsprint border-b-2 border-yellow hover:text-yellow"
+              className="mt-10 inline-block font-[family-name:var(--font-grotesk)] text-sm font-bold uppercase tracking-widest text-paper border-b-2 border-yellow pb-1 hover:text-yellow transition-colors"
             >
-              READ THE MANIFESTO
+              Read the Manifesto →
             </Link>
           </Reveal>
         </div>
       </section>
 
-      {/* ---------- SHOP PREVIEW ---------- */}
-      <section className="mx-auto max-w-[1440px] px-6 py-20">
+      {/* ---------- SHOP PREVIEW (paper / editorial) ---------- */}
+      <section className="mx-auto max-w-[1600px] px-6 sm:px-8 py-20">
         <Reveal>
-          <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
-            <div>
-              <p className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-[0.3em] text-gray">
-                03 — The Goods
-              </p>
-              <h2 className="mt-2 font-[family-name:var(--font-display)] text-5xl sm:text-6xl text-offwhite">
-                Free <span className="text-forest">+</span> paid, <span className="text-red">relentlessly.</span>
-              </h2>
-            </div>
-            <Link
-              href="/shop"
-              className="font-[family-name:var(--font-mono)] text-sm uppercase tracking-widest text-newsprint hover:text-yellow"
-            >
-              Full shop →
-            </Link>
-          </div>
+          <SectionHead
+            number="03"
+            kicker="The Goods"
+            link={{ href: "/shop", label: "Full shop" }}
+          >
+            Free <span className="text-forest">+</span> paid, <span className="text-red">relentlessly.</span>
+          </SectionHead>
         </Reveal>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {products.slice(0, 3).map((p, i) => (
             <Reveal key={p.id} delay={i * 80}>
-              <div
-                className="h-full border border-mediumdark bg-ink p-6 flex flex-col"
-                style={{ borderTop: `4px solid ${p.accent}` }}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-[family-name:var(--font-mono)] text-xs uppercase tracking-widest text-gray">
-                    {p.voice}
-                  </span>
-                  <span
-                    className="font-[family-name:var(--font-display)] text-2xl"
-                    style={{ color: p.free ? "#2d5f2e" : "#ffe135" }}
-                  >
-                    {p.price}
-                  </span>
+              <Link href="/shop" className="ed-card group block h-full">
+                <div
+                  className="ed-card__media grain relative h-32 flex items-end p-5"
+                  style={{ background: p.accent }}
+                >
+                  <span className="eyebrow text-ink/70">{p.voice}</span>
                 </div>
-                <h3 className="mt-3 font-[family-name:var(--font-display)] text-3xl text-offwhite">
-                  {p.name}
-                </h3>
-                <p className="mt-2 flex-1 text-newsprint">{p.blurb}</p>
-                <p className="mt-4 font-[family-name:var(--font-spacemono)] text-xs text-gray">
-                  {p.count}
-                </p>
-              </div>
+                <div className="p-5">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <h3 className="font-[family-name:var(--font-grotesk)] font-bold text-2xl tracking-tight text-ink">
+                      {p.name}
+                    </h3>
+                    <span
+                      className="font-[family-name:var(--font-display)] text-2xl"
+                      style={{ color: p.free ? "#1f6f43" : "#141312" }}
+                    >
+                      {p.price}
+                    </span>
+                  </div>
+                  <p className="mt-2 font-[family-name:var(--font-serif)] text-ink/80">{p.blurb}</p>
+                  <p className="mt-4 font-[family-name:var(--font-spacemono)] text-xs text-stone">
+                    {p.count}
+                  </p>
+                </div>
+              </Link>
             </Reveal>
           ))}
         </div>
       </section>
 
-      {/* ---------- JOIN CTA ---------- */}
-      <section className="border-t border-mediumdark bg-gradient-to-b from-ink to-trueblack">
-        <div className="mx-auto max-w-3xl px-6 py-24 text-center">
+      {/* ---------- JOIN CTA (electric yellow block) ---------- */}
+      <section className="bg-yellow border-t border-ink">
+        <div className="mx-auto max-w-4xl px-6 sm:px-8 py-24 text-center">
           <Reveal>
-            <h2 className="font-[family-name:var(--font-display)] text-5xl sm:text-7xl text-offwhite">
-              IT'S <span className="text-yellow">TERRY TIME</span>
+            <h2 className="font-[family-name:var(--font-display)] text-6xl sm:text-8xl tracking-tight text-ink leading-[0.85]">
+              IT'S TERRY TIME
             </h2>
-            <p className="mt-4 font-[family-name:var(--font-serif)] text-xl text-newsprint">
+            <p className="mt-5 font-[family-name:var(--font-serif)] text-xl text-ink/80">
               Free sketches, sticker drops, and the #addmore challenge — straight to your inbox.
             </p>
             <Link
               href="/community"
-              className="mt-8 inline-block border-2 border-yellow bg-yellow px-10 py-4 font-[family-name:var(--font-display)] text-xl tracking-widest text-ink transition-transform hover:scale-[0.98]"
+              className="mt-9 inline-block bg-ink text-paper px-10 py-4 font-[family-name:var(--font-grotesk)] text-base font-bold uppercase tracking-widest hover:bg-red transition-colors"
             >
-              JOIN THE COLLECTIVE
+              Join the Collective
             </Link>
           </Reveal>
         </div>
       </section>
     </>
+  );
+}
+
+function SectionHead({
+  number,
+  kicker,
+  link,
+  children,
+}: {
+  number: string;
+  kicker: string;
+  link?: { href: string; label: string };
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="border-t-2 border-ink pt-5">
+      <div className="flex items-end justify-between flex-wrap gap-4">
+        <div>
+          <p className="eyebrow text-stone mb-3">
+            {number} — {kicker}
+          </p>
+          <h2 className="font-[family-name:var(--font-grotesk)] font-bold text-4xl sm:text-6xl tracking-tight text-ink max-w-3xl">
+            {children}
+          </h2>
+        </div>
+        {link && (
+          <Link
+            href={link.href}
+            className="font-[family-name:var(--font-grotesk)] text-sm font-bold uppercase tracking-widest text-ink border-b-2 border-yellow pb-1 hover:text-red transition-colors whitespace-nowrap"
+          >
+            {link.label} →
+          </Link>
+        )}
+      </div>
+    </div>
   );
 }
