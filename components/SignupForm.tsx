@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { isStaticExport } from "@/lib/site";
 
 type Status = "idle" | "loading" | "done" | "error";
 
@@ -12,6 +13,11 @@ export function SignupForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
+    if (isStaticExport) {
+      // No backend on a static host — acknowledge without a dead request.
+      setStatus("done");
+      return;
+    }
     setStatus("loading");
     setError(null);
     try {

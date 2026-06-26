@@ -4,6 +4,7 @@ import Image from "next/image";
 import { products } from "@/lib/products";
 import { Reveal } from "@/components/Reveal";
 import { BuyButton } from "@/components/BuyButton";
+import { CanceledBanner } from "@/components/CanceledBanner";
 
 export const metadata: Metadata = {
   title: "Shop",
@@ -11,12 +12,7 @@ export const metadata: Metadata = {
     "Free downloads and premium sticker packs. One sticker. Infinite hustle. The free + paid funnel, relentlessly.",
 };
 
-export default async function ShopPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ canceled?: string }>;
-}) {
-  const { canceled } = await searchParams;
+export default function ShopPage() {
   const free = products.filter((p) => p.free);
   const paid = products.filter((p) => !p.free);
 
@@ -33,12 +29,7 @@ export default async function ShopPage({
         </p>
       </header>
 
-      {canceled && (
-        <div className="mt-8 border-2 border-red bg-cloud p-4 font-[family-name:var(--font-mono)] text-sm text-ink">
-          <span className="text-red font-bold">Checkout canceled.</span> No charge. Berry says
-          take your time.
-        </div>
-      )}
+      <CanceledBanner />
 
       {/* Free */}
       <section className="mt-14">

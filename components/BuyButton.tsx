@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Product } from "@/lib/products";
+import { asset, isStaticExport } from "@/lib/site";
 
 export function BuyButton({ product }: { product: Product }) {
   const [loading, setLoading] = useState(false);
@@ -32,7 +33,7 @@ export function BuyButton({ product }: { product: Product }) {
   if (product.free) {
     return (
       <a
-        href={product.downloadUrl ?? "#"}
+        href={product.downloadUrl ? asset(product.downloadUrl) : "#"}
         download
         className="mt-5 inline-block w-full border border-ink bg-paper px-6 py-3 text-center font-[family-name:var(--font-grotesk)] text-sm font-bold uppercase tracking-widest text-ink transition-colors hover:bg-forest hover:border-forest hover:text-paper"
       >
@@ -45,13 +46,20 @@ export function BuyButton({ product }: { product: Product }) {
     <div className="mt-5">
       <button
         onClick={onBuy}
-        disabled={loading}
+        disabled={loading || isStaticExport}
+        title={isStaticExport ? "Checkout runs on the live site" : undefined}
         className="w-full border border-ink bg-ink px-6 py-3 font-[family-name:var(--font-grotesk)] text-sm font-bold uppercase tracking-widest text-paper transition-colors hover:bg-red hover:border-red disabled:opacity-60"
       >
         {loading ? "Starting…" : `Buy — ${product.price}`}
       </button>
-      {error && (
-        <p className="mt-2 font-[family-name:var(--font-spacemono)] text-xs text-red">{error}</p>
+      {isStaticExport ? (
+        <p className="mt-2 font-[family-name:var(--font-spacemono)] text-xs text-stone">
+          Checkout runs on the live site.
+        </p>
+      ) : (
+        error && (
+          <p className="mt-2 font-[family-name:var(--font-spacemono)] text-xs text-red">{error}</p>
+        )
       )}
     </div>
   );
