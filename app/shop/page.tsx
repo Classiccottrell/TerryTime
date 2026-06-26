@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { products } from "@/lib/products";
 import { Reveal } from "@/components/Reveal";
 import { BuyButton } from "@/components/BuyButton";
@@ -88,11 +89,15 @@ export default async function ShopPage({
 function ProductCard({ p }: { p: (typeof products)[number] }) {
   return (
     <div className="ed-card flex h-full flex-col">
-      <div
-        className="ed-card__media grain relative h-28 flex items-end p-5"
-        style={{ background: p.accent }}
-      >
-        <span className="eyebrow text-ink/70">{p.voice}</span>
+      <div className="ed-card__media relative h-40">
+        <Image
+          src={`/img/products/${p.id}.svg`}
+          alt={p.name}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover"
+        />
+        <span className="absolute bottom-3 left-5 eyebrow text-paper/80">{p.voice}</span>
       </div>
       <div className="flex flex-1 flex-col p-6">
         <div className="flex items-baseline justify-between gap-3">

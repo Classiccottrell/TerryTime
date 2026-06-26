@@ -11,6 +11,8 @@ export type Character = {
   accent: string;
   secondary: string;
   font: "display" | "mono" | "serif";
+  /** Placeholder art tile for this voice. */
+  image: string;
 };
 
 export const characters: Character[] = [
@@ -37,6 +39,7 @@ export const characters: Character[] = [
     accent: "#ffe135",
     secondary: "#f5f5f5",
     font: "display",
+    image: "/img/characters/terry-the-sketcher.svg",
   },
   {
     slug: "terry-the-philosopher",
@@ -61,6 +64,7 @@ export const characters: Character[] = [
     accent: "#808080",
     secondary: "#ffffff",
     font: "mono",
+    image: "/img/characters/terry-the-philosopher.svg",
   },
   {
     slug: "larry-the-documentarian",
@@ -85,6 +89,7 @@ export const characters: Character[] = [
     accent: "#cc0000",
     secondary: "#e8e8e8",
     font: "mono",
+    image: "/img/characters/larry-the-documentarian.svg",
   },
   {
     slug: "berry-the-editor",
@@ -109,6 +114,7 @@ export const characters: Character[] = [
     accent: "#2d5f2e",
     secondary: "#fafafa",
     font: "display",
+    image: "/img/characters/berry-the-editor.svg",
   },
 ];
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { characters, getCharacter } from "@/lib/characters";
 import { Reveal } from "@/components/Reveal";
@@ -35,9 +36,25 @@ export default async function CharacterPage({
     <article>
       {/* Hero — full colour block in the character's primary */}
       <header
-        className="grain grain-ink relative border-b border-ink text-paper"
+        className="grain grain-ink relative border-b border-ink text-paper overflow-hidden"
         style={{ background: c.primary }}
       >
+        <Image
+          src={c.image}
+          alt=""
+          aria-hidden
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover opacity-55"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0.12) 100%)",
+          }}
+        />
         <div className="relative mx-auto max-w-[1600px] px-6 sm:px-8 py-16 sm:py-20">
           <Link
             href="/characters"
@@ -150,10 +167,25 @@ export default async function CharacterPage({
       {/* Next character */}
       <Link
         href={`/characters/${next.slug}`}
-        className="group grain grain-ink relative block border-t border-ink text-paper"
+        className="group grain grain-ink relative block border-t border-ink text-paper overflow-hidden"
         style={{ background: next.primary }}
       >
-        <div className="mx-auto max-w-[1600px] px-6 sm:px-8 py-14 flex items-center justify-between gap-4">
+        <Image
+          src={next.image}
+          alt=""
+          aria-hidden
+          fill
+          sizes="100vw"
+          className="object-cover opacity-40 transition-opacity group-hover:opacity-60"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 70%, rgba(0,0,0,0.15) 100%)",
+          }}
+        />
+        <div className="relative mx-auto max-w-[1600px] px-6 sm:px-8 py-14 flex items-center justify-between gap-4">
           <div>
             <p className="eyebrow text-paper/70">Next</p>
             <p className="font-[family-name:var(--font-display)] text-5xl sm:text-7xl tracking-tight group-hover:opacity-80 transition-opacity">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { characters } from "@/lib/characters";
 import { products } from "@/lib/products";
 import { CharacterCard } from "@/components/CharacterCard";
@@ -47,6 +48,20 @@ export default function Home() {
           </div>
         </div>
         <div className="divider-line" />
+      </section>
+
+      {/* ---------- GALLERY BANNER (image-forward, all four voices) ---------- */}
+      <section className="border-b border-ink bg-ink">
+        <div className="relative w-full aspect-[1600/520]">
+          <Image
+            src="/img/hero-collective.svg"
+            alt="The four voices — the Sketcher, the Philosopher, the Documentarian, and the Editor"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        </div>
       </section>
 
       {/* ---------- THE FOUR (paper / editorial grid) ---------- */}
@@ -106,11 +121,17 @@ export default function Home() {
           {products.slice(0, 3).map((p, i) => (
             <Reveal key={p.id} delay={i * 80}>
               <Link href="/shop" className="ed-card group block h-full">
-                <div
-                  className="ed-card__media grain relative h-32 flex items-end p-5"
-                  style={{ background: p.accent }}
-                >
-                  <span className="eyebrow text-ink/70">{p.voice}</span>
+                <div className="ed-card__media relative h-36">
+                  <Image
+                    src={`/img/products/${p.id}.svg`}
+                    alt={p.name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 33vw"
+                    className="object-cover"
+                  />
+                  <span className="absolute bottom-3 left-4 eyebrow text-paper/80">
+                    {p.voice}
+                  </span>
                 </div>
                 <div className="p-5">
                   <div className="flex items-baseline justify-between gap-3">

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="420" viewBox="0 0 800 420" role="img" aria-label="Community remix zine cover">
+  <rect width="800" height="420" fill="#0f0f0f"/>
+  <rect x="40" y="40" width="720" height="340" fill="none" stroke="#2d5f2e" stroke-width="3"/>
+  <defs>
+    <linearGradient id="d2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#141312"/><stop offset="0.35" stop-color="#ffe135"/>
+      <stop offset="0.7" stop-color="#e0301e"/><stop offset="1" stop-color="#2d5f2e"/>
+    </linearGradient>
+  </defs>
+  <rect x="70" y="150" width="660" height="5" fill="url(#d2)"/>
+  <text x="70" y="130" font-family="'Arial Narrow', sans-serif" font-weight="bold" font-size="72" letter-spacing="2" fill="#2d5f2e">#ADDMORE</text>
+  <g font-family="'IBM Plex Mono', monospace" font-size="22" fill="#e8e8e8">
+    <text x="70" y="220">SEE IT TWICE.</text>
+    <text x="70" y="260" fill="#ffe135">DRAW IT AGAIN.</text>
+    <text x="70" y="300" fill="#e0301e">SHOOT THE MOMENT.</text>
+    <text x="70" y="340" fill="#9a9488">CUT WHAT'S TOO MUCH.</text>
+  </g>
+</svg>
