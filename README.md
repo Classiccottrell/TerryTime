@@ -1,74 +1,77 @@
 # Terry Terry Larry Berry
 
-An East Van underground art collective masquerading as a sticker brand. This repository contains the complete brand system, frontend landing page, backend scaffolding, and AI-ingestible skill definitions.
+An East Van underground art collective masquerading as a sticker brand. Four voices —
+**Terry the Sketcher**, **Terry the Philosopher**, **Larry the Documentarian**, and
+**Berry the Editor** — that must blend, never reduce.
 
-## ⚠️ Important Note on System Requirements
+This repo is the brand's website, rebuilt on a modern stack.
 
-**You do NOT currently have Node.js or NPM installed on your Mac.** 
-This is why your previous attempts to run commands like `npm install`, `node server.js`, or `npx serve` were failing.
+## Tech Stack
 
-To test the site immediately, use the Python test instructions below. If you want to deploy the automated Stripe storefront, you **must download and install Node.js** (from [nodejs.org](https://nodejs.org)) beforehand.
+- **[Next.js 15](https://nextjs.org)** (App Router, React 19, static-export friendly)
+- **[TypeScript](https://www.typescriptlang.org)** end to end
+- **[Tailwind CSS v4](https://tailwindcss.com)** with the brand design tokens encoded in
+  `app/globals.css`
+- **`next/font`** for the brand type stack (Bebas Neue, Crimson Text, IBM Plex Mono, Space Mono)
 
----
+No backend is required to run the site — it builds to fully static HTML.
 
-## 🛠 How to Test Locally RIGHT NOW
+## Getting Started
 
-Because your Mac already has Python 3 installed, you can launch a local web server to test the site immediately. 
-
-1. Open your terminal.
-2. Clone this repository and navigate into it:
-   ```bash
-   git clone https://github.com/Classiccottrell/TerryTime.git
-   cd TerryTime
-   ```
-3. Run the following command:
-   ```bash
-   python3 -m http.server 8000 --directory client
-   ```
-4. Open your web browser and go to: **[http://localhost:8000](http://localhost:8000)**
-
----
-
-## 🚀 Deployment & The Backend (Requires Node.js)
-
-I have unified the project structure. Once deployed, the server will automatically serve your frontend website *and* handle your Stripe automated shop payments on the same URL!
-
-### 1. Install Node.js
-Go to [nodejs.org](https://nodejs.org) and download/install the LTS version for macOS.
-
-### 2. Configure Your Keys
-Rename the `.env.example` file in the root folder to `.env` and paste your actual Stripe and (eventually) Printful API keys inside it.
-
-### 3. Run the Full App
-Open your terminal to the `TerryTime` root folder and run:
 ```bash
-npm install     # Installs all necessary backend dependencies
-npm start       # Starts the combined frontend/backend server
+npm install      # install dependencies
+npm run dev      # start the dev server at http://localhost:3000
+npm run build    # production build
+npm start        # serve the production build
 ```
-The site will be live at `http://localhost:4242` with Stripe checkout hooks fully active!
 
----
+> Requires Node.js 18.18+ (tested on Node 22).
 
-## 📂 Repository Structure
+## Project Structure
 
 ```text
 TerryTime/
-├── .agents/
-│   └── skills/           # AI Brand Documentation (Your Source of Truth)
-│       ├── SKILL-TERRY-DESIGN-SYSTEM.md
-│       ├── SKILL-TERRY-CHARACTER-VOICES.md
-│       ├── SKILL-TERRY-COMMUNITY-ORCHESTRATION.md
-│       └── CHARACTER-PROFILES.md
-├── client/               # The Frontend Landing Page (HTML/CSS/JS)
-├── server/               # The Backend Node API
-├── package.json          # Dependency list for deployment
-└── .env.example          # Template for your Secret API keys
+├── app/                      # Next.js App Router
+│   ├── layout.tsx            # Root layout: fonts, nav, ticker, footer
+│   ├── globals.css           # Tailwind v4 theme + brand design tokens
+│   ├── page.tsx              # Home / the studio
+│   ├── characters/           # The Four — listing + dynamic [slug] profiles
+│   ├── shop/                 # Sticker shop (free + paid funnel)
+│   ├── manifesto/            # The brand manifesto
+│   ├── community/            # Join the collective + signup
+│   ├── not-found.tsx         # 404, edited out of existence by Berry
+│   └── icon.svg              # Favicon
+├── components/               # Nav, Footer, Ticker, CharacterCard, Reveal, SignupForm
+├── lib/                      # Data: characters.ts, products.ts
+└── .agents/skills/           # Brand source of truth (design system + character voices)
 ```
 
-## 🧠 Using AI to Expand the Site
+## The Source of Truth
 
-Because you have the `.agents/skills/` folder, expanding the site using an LLM is a breeze. When using Claude or Gemini, you can prompt like this:
+The `.agents/skills/` folder is the canonical brand documentation — the design system,
+the four character voices, and the community strategy. The site's colors, type, copy, and
+components all derive from it. When extending the site, read those files first so new pages
+stay in voice.
 
-> *"Read the markdown files in `.agents/skills/`. Build a new HTML page called `client/about.html` that uses the 'philosopher-card' aesthetic to display an essay written entirely in the tone of Terry the Philosopher."*
+## Design System (at a glance)
 
-The AI will output perfectly matching HTML, `#2C2C2C` colors, and the correct voice automatically.
+| Voice | Primary | Accent |
+| --- | --- | --- |
+| Terry — Sketcher | `#1A1A1A` | `#FFE135` electric yellow |
+| Terry — Philosopher | `#2C2C2C` | `#808080` gray |
+| Larry — Documentarian | `#0F0F0F` | `#CC0000` documentary red |
+| Berry — Editor | `#3D3D3D` | `#2D5F2E` forest green |
+
+Sharp corners, an 8px spacing grid, restrained motion, and the gradient "shouting match"
+divider tie it together.
+
+## Deploy
+
+Any Next.js host works. Easiest paths:
+
+- **Vercel** — import the repo, zero config.
+- **Netlify** — uses the official Next.js runtime, zero config.
+
+---
+
+_One sticker. Infinite hustle. #eastvan_

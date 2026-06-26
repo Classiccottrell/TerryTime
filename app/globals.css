@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+/*
+  Terry Terry Larry Berry — Design System
+  Four voices that must blend, never reduce.
+  Tokens sourced from .agents/skills/SKILL-TERRY-DESIGN-SYSTEM.md
+*/
+
+@theme {
+  /* Sketcher */
+  --color-ink: #1a1a1a;
+  --color-yellow: #ffe135;
+  --color-offwhite: #f5f5f5;
+
+  /* Philosopher */
+  --color-charcoal: #2c2c2c;
+  --color-gray: #808080;
+
+  /* Larry / Documentarian */
+  --color-trueblack: #0f0f0f;
+  --color-red: #cc0000;
+  --color-newsprint: #e8e8e8;
+
+  /* Berry / Editor */
+  --color-mediumdark: #3d3d3d;
+  --color-forest: #2d5f2e;
+  --color-bone: #fafafa;
+
+  /* Type — backed by next/font variables, with system fallbacks */
+  --font-display: var(--font-bebas), "Arial Narrow", sans-serif;
+  --font-mono: var(--font-plex), ui-monospace, monospace;
+  --font-serif: var(--font-crimson), Georgia, serif;
+  --font-spacemono: var(--font-space), ui-monospace, monospace;
+
+  /* Sharp corners by default — raw aesthetic */
+  --radius: 0px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-trueblack);
+    color: var(--color-offwhite);
+    font-family: var(--font-serif);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-yellow);
+    color: var(--color-ink);
+  }
+
+  /* Bright yellow focus ring on all interactive elements (a11y) */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--color-yellow);
+    outline-offset: 3px;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: 0.06em;
+    line-height: 0.95;
+  }
+}
+
+/* ---- Ticker tape ---- */
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-ticker {
+  animation: ticker 30s linear infinite;
+}
+
+/* ---- Scroll reveal ---- */
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.reveal {
+  animation: reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ---- Gradient divider (the visual shouting match) ---- */
+.divider-line {
+  height: 2px;
+  background: linear-gradient(90deg, #1a1a1a 0%, #ffe135 35%, #cc0000 70%, #2d5f2e 100%);
+}
+
+/* ---- Sketch grain texture overlay ---- */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ticker,
+  .reveal {
+    animation: none;
+  }
+  html { scroll-behavior: auto; }
+}
