@@ -1,19 +1,26 @@
 {
-  "name": "terry-time-backend",
-  "version": "1.0.0",
-  "description": "Backend API for TerryTime Stripe and Printful integrations.",
-  "main": "server.js",
+  "name": "terry-time",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Terry Terry Larry Berry — an East Van underground art collective masquerading as a sticker brand.",
   "scripts": {
-    "start": "node server/server.js",
-    "dev": "node server/server.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "stripe": "^14.24.0"
+    "next": "^15.5.19",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "stripe": "^18.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.0"
   }
 }
