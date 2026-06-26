@@ -14,7 +14,30 @@ This repo is the brand's website, rebuilt on a modern stack.
   `app/globals.css`
 - **`next/font`** for the brand type stack (Bebas Neue, Crimson Text, IBM Plex Mono, Space Mono)
 
-No backend is required to run the site — it builds to fully static HTML.
+The marketing pages are static; checkout and newsletter signup run on Next.js
+route handlers (Node runtime). Everything degrades gracefully — the site builds
+and runs with no secrets, and the live features turn on the moment you add keys.
+
+## Integrations
+
+| Feature | Endpoint | Enable with |
+| --- | --- | --- |
+| Stripe checkout (paid packs) | `POST /api/checkout` | `STRIPE_SECRET_KEY` |
+| Stripe webhook (fulfilment hook) | `POST /api/webhook` | `STRIPE_WEBHOOK_SECRET` |
+| Newsletter signup | `POST /api/subscribe` | `RESEND_API_KEY` + `RESEND_AUDIENCE_ID`, or `NEWSLETTER_WEBHOOK_URL` |
+
+- **Checkout** builds a Stripe Checkout Session from inline `price_data`, so no
+  Stripe dashboard product setup is needed — just a secret key. Prices live in
+  `lib/products.ts` (`priceCents`, CAD). Success → `/shop/success`, cancel →
+  `/shop?canceled=1`.
+- **Webhook** verifies the signature and logs `checkout.session.completed`;
+  drop your Printful (or other) fulfilment call where the `TODO` is in
+  `app/api/webhook/route.ts`.
+- **Newsletter** adds the contact to a Resend audience, or POSTs `{ email }` to a
+  generic webhook (Buttondown / ConvertKit / Zapier / Mailchimp).
+- Without any of these set, the buttons show an honest "not live yet" message.
+
+Copy `.env.example` → `.env.local` and fill in what you want to enable.
 
 ## Getting Started
 
@@ -36,13 +59,16 @@ TerryTime/
 │   ├── globals.css           # Tailwind v4 theme + brand design tokens
 │   ├── page.tsx              # Home / the studio
 │   ├── characters/           # The Four — listing + dynamic [slug] profiles
-│   ├── shop/                 # Sticker shop (free + paid funnel)
+│   ├── shop/                 # Sticker shop (free + paid funnel) + /success
 │   ├── manifesto/            # The brand manifesto
 │   ├── community/            # Join the collective + signup
+│   ├── api/                  # Route handlers: checkout, subscribe, webhook
 │   ├── not-found.tsx         # 404, edited out of existence by Berry
 │   └── icon.svg              # Favicon
-├── components/               # Nav, Footer, Ticker, CharacterCard, Reveal, SignupForm
-├── lib/                      # Data: characters.ts, products.ts
+├── components/               # Nav, Footer, Ticker, CharacterCard, Reveal,
+│                             #   SignupForm, BuyButton
+├── lib/                      # Data + clients: characters.ts, products.ts, stripe.ts
+├── public/downloads/         # Free downloadable SVG sticker sheets
 └── .agents/skills/           # Brand source of truth (design system + character voices)
 ```
 

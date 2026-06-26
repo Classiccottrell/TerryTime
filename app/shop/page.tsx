@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { products } from "@/lib/products";
 import { Reveal } from "@/components/Reveal";
+import { BuyButton } from "@/components/BuyButton";
 
 export const metadata: Metadata = {
   title: "Shop",
@@ -9,7 +10,12 @@ export const metadata: Metadata = {
     "Free downloads and premium sticker packs. One sticker. Infinite hustle. The free + paid funnel, relentlessly.",
 };
 
-export default function ShopPage() {
+export default async function ShopPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ canceled?: string }>;
+}) {
+  const { canceled } = await searchParams;
   const free = products.filter((p) => p.free);
   const paid = products.filter((p) => !p.free);
 
@@ -28,6 +34,13 @@ export default function ShopPage() {
         </p>
       </header>
 
+      {canceled && (
+        <div className="mt-8 border-2 border-red bg-ink p-4 font-[family-name:var(--font-mono)] text-sm text-newsprint">
+          <span className="text-red">Checkout canceled.</span> No charge. Berry says take your
+          time.
+        </div>
+      )}
+
       {/* Free */}
       <section className="mt-14">
         <div className="flex items-center gap-3 mb-6">
@@ -39,7 +52,7 @@ export default function ShopPage() {
         <div className="grid gap-6 sm:grid-cols-2">
           {free.map((p, i) => (
             <Reveal key={p.id} delay={i * 80}>
-              <ProductCard p={p} cta="Download" />
+              <ProductCard p={p} />
             </Reveal>
           ))}
         </div>
@@ -56,7 +69,7 @@ export default function ShopPage() {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {paid.map((p, i) => (
             <Reveal key={p.id} delay={i * 80}>
-              <ProductCard p={p} cta="Add to cart" />
+              <ProductCard p={p} />
             </Reveal>
           ))}
         </div>
@@ -64,8 +77,8 @@ export default function ShopPage() {
 
       {/* Note */}
       <div className="mt-16 border border-mediumdark bg-ink p-6 font-[family-name:var(--font-mono)] text-sm text-gray">
-        <span className="text-red">Note —</span> checkout is wired for a future Stripe + Printful
-        integration. For now, drops are announced to the collective first.{" "}
+        <span className="text-red">Note —</span> paid packs check out securely through Stripe;
+        orders are passed to print-on-demand fulfilment. Want drops before anyone else?{" "}
         <Link href="/community" className="text-yellow hover:underline">
           Get on the list →
         </Link>
@@ -74,13 +87,7 @@ export default function ShopPage() {
   );
 }
 
-function ProductCard({
-  p,
-  cta,
-}: {
-  p: (typeof products)[number];
-  cta: string;
-}) {
+function ProductCard({ p }: { p: (typeof products)[number] }) {
   return (
     <div
       className="h-full border border-mediumdark bg-ink p-6 flex flex-col"
@@ -104,12 +111,7 @@ function ProductCard({
         {p.blurb}
       </p>
       <p className="mt-4 font-[family-name:var(--font-spacemono)] text-xs text-gray">{p.count}</p>
-      <button
-        className="mt-5 border-2 px-6 py-2.5 font-[family-name:var(--font-display)] text-base tracking-widest transition-colors"
-        style={{ borderColor: p.accent, color: p.accent }}
-      >
-        {cta.toUpperCase()}
-      </button>
+      <BuyButton product={p} />
     </div>
   );
 }
