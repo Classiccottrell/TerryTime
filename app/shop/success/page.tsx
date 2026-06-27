@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getStripe } from "@/lib/stripe";
+import { isStaticExport } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Order confirmed",
@@ -12,18 +13,21 @@ export default async function SuccessPage({
 }: {
   searchParams: Promise<{ session_id?: string }>;
 }) {
-  const { session_id } = await searchParams;
-
   let itemName: string | null = null;
-  const stripe = getStripe();
-  if (stripe && session_id) {
-    try {
-      const session = await stripe.checkout.sessions.retrieve(session_id, {
-        expand: ["line_items"],
-      });
-      itemName = session.line_items?.data?.[0]?.description ?? null;
-    } catch {
-      // Ignore — show the generic confirmation.
+  // On a static host there's no server-side Stripe lookup (and no request-time
+  // searchParams). The generic confirmation below is shown instead.
+  if (!isStaticExport) {
+    const { session_id } = await searchParams;
+    const stripe = getStripe();
+    if (stripe && session_id) {
+      try {
+        const session = await stripe.checkout.sessions.retrieve(session_id, {
+          expand: ["line_items"],
+        });
+        itemName = session.line_items?.data?.[0]?.description ?? null;
+      } catch {
+        // Ignore — show the generic confirmation.
+      }
     }
   }
 
