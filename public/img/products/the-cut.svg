@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="420" viewBox="0 0 800 420" role="img" aria-label="Four essential stickers, the ones Berry kept">
-  <rect width="800" height="420" fill="#3d3d3d"/>
-  <g stroke="#fafafa" stroke-width="4">
-    <circle cx="200" cy="150" r="70" fill="#2d5f2e"/>
-    <rect x="380" y="80" width="140" height="140" fill="#2c2c2c"/>
-    <circle cx="640" cy="150" r="70" fill="#2c2c2c"/>
-    <rect x="260" y="270" width="280" height="110" fill="#2d5f2e"/>
+  <rect width="800" height="420" fill="#3b2a22"/>
+  <g stroke="#eae3d2" stroke-width="4">
+    <circle cx="200" cy="150" r="70" fill="#e84c92"/>
+    <rect x="380" y="80" width="140" height="140" fill="#5a463c"/>
+    <circle cx="640" cy="150" r="70" fill="#5a463c"/>
+    <rect x="260" y="270" width="280" height="110" fill="#e84c92"/>
   </g>
-  <g fill="#fafafa" font-family="'Arial Narrow', sans-serif" font-weight="bold" text-anchor="middle">
+  <g fill="#eae3d2" font-family="'Arial Narrow', sans-serif" font-weight="bold" text-anchor="middle">
     <text x="200" y="162" font-size="34">NO</text>
     <text x="450" y="162" font-size="30">KEEP</text>
     <text x="640" y="162" font-size="30">YES</text>

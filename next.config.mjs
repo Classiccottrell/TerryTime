@@ -2,7 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    // All SVGs served here are first-party static art in /public/img.
+    // Art here is first-party SVGs + placeholder JPGs that gain nothing from
+    // optimization. Serving them unoptimized keeps them always-fresh (no
+    // optimizer cache to go stale when art is swapped) and lets SVGs render
+    // without the optimizer path.
+    unoptimized: true,
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",

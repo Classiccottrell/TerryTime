@@ -1,23 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="420" viewBox="0 0 800 420" role="img" aria-label="The complete collection, all four voices in one pack">
-  <rect width="800" height="420" fill="#141312"/>
-  <g stroke="#fbf9f2" stroke-width="3">
+  <rect width="800" height="420" fill="#122e36"/>
+  <g stroke="#eae3d2" stroke-width="3">
     <!-- sketcher -->
-    <circle cx="150" cy="130" r="68" fill="#1a1a1a"/>
+    <circle cx="150" cy="130" r="68" fill="#2b2e77"/>
     <!-- philosopher -->
-    <rect x="290" y="60" width="140" height="140" fill="#2c2c2c"/>
+    <rect x="290" y="60" width="140" height="140" fill="#1e4e5f"/>
     <!-- larry -->
-    <circle cx="560" cy="130" r="68" fill="#0f0f0f"/>
+    <circle cx="560" cy="130" r="68" fill="#141210"/>
     <!-- berry -->
-    <rect x="660" y="240" width="120" height="120" fill="#3d3d3d"/>
-    <rect x="120" y="250" width="160" height="110" fill="#1a1a1a"/>
-    <circle cx="430" cy="310" r="60" fill="#0f0f0f"/>
+    <rect x="660" y="240" width="120" height="120" fill="#3b2a22"/>
+    <rect x="120" y="250" width="160" height="110" fill="#2b2e77"/>
+    <circle cx="430" cy="310" r="60" fill="#141210"/>
   </g>
   <g fill="none" stroke-width="4" stroke-linecap="round">
     <path d="M120 130 q30 -40 60 0" stroke="#ffe135"/>
-    <circle cx="360" cy="130" r="34" stroke="#808080"/>
-    <path d="M530 110 l30 -20 l30 20 v40 l-30 20 l-30 -20 z" stroke="#e0301e" fill="none"/>
-    <path d="M690 270 h60" stroke="#2d5f2e"/>
+    <circle cx="360" cy="130" r="34" stroke="#e39b82"/>
+    <path d="M530 110 l30 -20 l30 20 v40 l-30 20 l-30 -20 z" stroke="#e23b2e" fill="none"/>
+    <path d="M690 270 h60" stroke="#e84c92"/>
     <path d="M150 305 h100" stroke="#ffe135"/>
-    <path d="M410 310 h40 M430 290 v40" stroke="#e8e8e8"/>
+    <path d="M410 310 h40 M430 290 v40" stroke="#eae3d2"/>
   </g>
 </svg>

@@ -79,23 +79,30 @@ the four character voices, and the community strategy. The site's colors, type, 
 components all derive from it. When extending the site, read those files first so new pages
 stay in voice.
 
-## Design System — Editorial v2
+## Design System — v3 "Moody Teal"
 
-The theme is a deliberate mash-up of three art publications, mapped onto Terry's
-four-voice brand. The tokens live in `app/globals.css` (`@theme`).
+There's a **living design-system library at [`/design-system`](/design-system)** —
+palette, type, the four voices, iconography, components, spacing, and motion, all in
+one place. Start there. Tokens live in `app/globals.css` (`@theme`) and are mirrored
+as data in `lib/design-tokens.ts` (which drives that page).
 
-| Influence | What we took |
-| --- | --- |
-| **Colossal** | Warm paper canvas, gallery whitespace, hairline rules, image-worship cards |
-| **It's Nice That** | Oversized confident headlines, electric accent, strong modular grid |
-| **Juxtapoz** | High-contrast ink blocks, underground/punk edge, zero rounded corners |
+The palette + feeling are pulled from three source works (in `public/img/characters`):
+an outsider-art painting (teal ground, terracotta figure, red halo, star·eye·key
+talismans), a B&W East-Van graffiti-bin photo, and a raw ballpoint sketch on bone
+paper. Those images double as the placeholder art for the Philosopher, Larry, and the
+Sketcher.
 
-**Canvas alternation** — pages breathe on warm paper (`--color-paper #f3efe4`) and
-punch into near-black ink blocks (`--color-ink #141312`) for emphasis.
+**Canvas alternation** — pages breathe on warm bone (`--color-paper #EAE3D2`) and punch
+into deep teal-black blocks (`--color-ink #122E36`), with a brighter feature teal
+(`--color-teal #1E4E5F`).
 
-**Accents** keep the four-voice system: electric yellow `#FFE135` (the pop), red
-`#E0301E`, forest `#1F6F43`, charcoal `#2C2C2C`. The gradient "shouting match"
-divider still ties sections together.
+**Accents** keep the electric yellow `#FFE135` as the signature pop, surrounded by an
+earthy cast: vermilion `#E23B2E`, terracotta `#B25A2B`, magenta `#E84C92`, indigo
+`#2B2E77`, ochre `#C6A02C`, coral `#E39B82` (forest `#1F6F43` reserved for "free").
+The gradient "shouting match" divider still ties sections together.
+
+**Iconography** — a hand-drawn talisman set (star · eye · key + voice motifs) lives in
+`components/icons.tsx`; render with `<Icon name="eye" />`.
 
 **Type roles**
 

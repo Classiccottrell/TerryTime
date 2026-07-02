@@ -22,7 +22,7 @@ export default function Home() {
           <h1 className="font-[family-name:var(--font-display)] tracking-tight leading-[0.82] text-ink text-[19vw] sm:text-[15vw] lg:text-[12.5rem]">
             TERRY TERRY
             <br />
-            <span className="text-red">LARRY</span> <span className="text-forest">BERRY</span>
+            <span className="text-red">LARRY</span> <span className="text-teal">BERRY</span>
           </h1>
 
           <div className="mt-10 grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-end">
