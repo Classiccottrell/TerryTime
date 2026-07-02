@@ -18,9 +18,9 @@ const nextConfig = {
     assetPrefix: basePath || undefined,
   }),
   images: {
-    // GitHub Pages has no image optimization server.
+    // GitHub Pages has no image optimization server; art is first-party SVGs
+    // + placeholder JPGs that gain nothing from optimization anyway.
     unoptimized: isStaticExport,
-    // All SVGs served here are first-party static art in /public/img.
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",

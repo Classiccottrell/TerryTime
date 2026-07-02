@@ -1,33 +1,40 @@
 @import "tailwindcss";
 
 /*
-  Terry Terry Larry Berry — Editorial Design System v2
-  A mash-up of three art publications:
-    · Colossal      — gallery whitespace, paper canvas, hairline rules, image worship
-    · It's Nice That — oversized confident type, electric accent, modular grid
-    · Juxtapoz       — high-contrast ink blocks, underground/punk edge, no soft corners
-  Kept from the brand: the four-voice colour system + the punk ticker.
+  Terry Terry Larry Berry — Design System v3 "Moody Teal"
+  Palette + feeling pulled from three source works:
+    · an outsider-art painting — deep teal ground, terracotta figure, red halo,
+      talismans (star · eye · key)
+    · a B&W East-Van graffiti-bin photo — high-contrast documentary monochrome
+    · a raw ballpoint sketch — indigo ink over peach + mustard washes, on bone paper
+  Kept from the brand: the electric yellow pop + the punk ticker.
   Foundations sourced from .agents/skills/SKILL-TERRY-DESIGN-SYSTEM.md
 */
 
 @theme {
-  /* ---- Canvas + ink (the editorial alternation) ---- */
-  --color-paper: #f3efe4;   /* warm gallery paper — default canvas */
-  --color-cloud: #fbf9f2;   /* lifted paper, for cards */
-  --color-ink: #141312;     /* near-black — text + high-contrast blocks */
-  --color-soot: #1d1b19;    /* slightly lifted ink, for ink-section cards */
+  /* ---- Canvas + ink (light bone ↔ deep teal-black alternation) ---- */
+  --color-paper: #eae3d2;   /* warm bone — default canvas (sketch paper) */
+  --color-cloud: #f3eddf;   /* lifted bone, for cards */
+  --color-ink: #122e36;     /* deep teal-black — text + every dark block */
+  --color-soot: #1b3a44;    /* lifted teal, for cards on dark sections */
+  --color-teal: #1e4e5f;    /* feature teal — accent surface (painting ground) */
 
-  /* ---- Muted greys (paper / ink contexts) ---- */
-  --color-stone: #6b665c;   /* muted text on paper */
-  --color-smoke: #9a9488;   /* muted text on ink */
-  --color-line: #d8d2c4;    /* hairline rule on paper */
-  --color-lineink: #34312c; /* hairline rule on ink */
+  /* ---- Muted tones (bone / teal contexts) ---- */
+  --color-stone: #6e6656;   /* muted text on bone */
+  --color-smoke: #8fa0a0;   /* muted text on teal-ink */
+  --color-line: #d3c9b3;    /* hairline rule on bone */
+  --color-lineink: #2e4c52; /* hairline rule on teal-ink */
 
-  /* ---- Electric accents (the four voices) ---- */
-  --color-yellow: #ffe135;  /* Sketcher — the primary pop */
-  --color-red: #e0301e;     /* Larry — documentary red, brightened */
-  --color-forest: #1f6f43;  /* Berry — forest green, brightened */
-  --color-charcoal: #2c2c2c;/* Philosopher */
+  /* ---- Accents (electric pop + earth cast from the source works) ---- */
+  --color-yellow: #ffe135;      /* the signature pop — kept */
+  --color-ochre: #c6a02c;       /* mustard/ochre — earthy companion (sketch) */
+  --color-red: #e23b2e;         /* vermilion — the painting's red halo */
+  --color-terracotta: #b25a2b;  /* burnt sienna — the painted figure */
+  --color-magenta: #e84c92;     /* hot pink — sketch surface */
+  --color-indigo: #2b2e77;      /* ballpoint indigo — sketch ink */
+  --color-coral: #e39b82;       /* peach wash — soft support */
+  --color-forest: #1f6f43;      /* retained — used for "free" */
+  --color-charcoal: #2c2c2c;    /* mono — Larry's documentary black */
 
   /* ---- Type ---- */
   --font-display: var(--font-bebas), "Arial Narrow", sans-serif;     /* huge brand statements */
@@ -89,7 +96,7 @@
 /* ---- The gradient "shouting match" — punk accent bar ---- */
 .divider-line {
   height: 3px;
-  background: linear-gradient(90deg, #141312 0%, #ffe135 35%, #e0301e 70%, #1f6f43 100%);
+  background: linear-gradient(90deg, #122e36 0%, #ffe135 28%, #e23b2e 52%, #1e4e5f 74%, #e84c92 100%);
 }
 
 /* ---- Editorial card: image worship + hairline + hover lift ---- */
