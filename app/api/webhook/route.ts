@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
+import { createPrintfulOrder } from "@/lib/printful";
 
 export const runtime = "nodejs";
 
 /**
- * Stripe webhook receiver. Verifies the signature and acts on completed
- * checkouts. Configure the endpoint in the Stripe dashboard and set
- * STRIPE_WEBHOOK_SECRET. This is where you'd hand the order to Printful for
- * fulfilment.
+ * Stripe webhook receiver. Verifies the signature, then on a completed
+ * checkout creates a matching Printful order (see lib/printful.ts) as a
+ * DRAFT — it lands in the Printful dashboard unconfirmed, nothing ships
+ * automatically. Configure the endpoint (Stripe dashboard, or `stripe
+ * listen` for local dev) and set STRIPE_WEBHOOK_SECRET.
  */
 export async function POST(req: Request) {
   const stripe = getStripe();
@@ -37,7 +39,41 @@ export async function POST(req: Request) {
       console.log(
         `[webhook] Paid: ${session.metadata?.productId ?? "unknown"} — ${session.id}`
       );
-      // TODO: create a Printful order from session line items here.
+
+      const printfulVariantId = Number(session.metadata?.printfulVariantId);
+      const shipping = session.collected_information?.shipping_details;
+
+      if (!printfulVariantId || !shipping?.address) {
+        console.error(
+          `[webhook] Can't create Printful order for ${session.id} — missing variant id or shipping address.`
+        );
+        break;
+      }
+
+      try {
+        const order = await createPrintfulOrder({
+          externalId: session.id,
+          printfulVariantId,
+          quantity: 1,
+          recipient: {
+            name: shipping.name ?? session.customer_details?.name ?? "Customer",
+            email: session.customer_details?.email ?? undefined,
+            address1: shipping.address.line1 ?? "",
+            address2: shipping.address.line2 ?? undefined,
+            city: shipping.address.city ?? "",
+            state_code: shipping.address.state ?? undefined,
+            country_code: shipping.address.country ?? "",
+            zip: shipping.address.postal_code ?? "",
+          },
+        });
+        console.log(
+          `[webhook] Printful draft order ${order?.id ?? "(unknown id)"} created for ${session.id} — review and confirm it in the Printful dashboard.`
+        );
+      } catch (err) {
+        // Payment already succeeded — log loudly so this gets a manual
+        // follow-up rather than silently losing the order.
+        console.error(`[webhook] Printful order creation FAILED for ${session.id}:`, err);
+      }
       break;
     }
     default:

@@ -39,11 +39,14 @@ on the moment you add a Stripe key.
   `public/img/products/`). `PRINTFUL_API_KEY` (an all-access token) lives in
   `.env.local` (gitignored; see `.env.example` for the var name) and can pull
   the rest of the catalog when their photography is ready. Each variant
-  carries a `printfulVariantId` for future order-fulfilment wiring —
-  `app/api/webhook` doesn't call Printful yet, that's a TODO.
-- **Webhook** verifies the signature and logs `checkout.session.completed`;
-  drop the Printful order-creation call where the `TODO` is in
-  `app/api/webhook/route.ts`.
+  carries a `printfulVariantId`, used by `lib/printful.ts` to create the
+  fulfilment order on a completed checkout.
+- **Webhook** verifies the signature, logs `checkout.session.completed`, and
+  creates a matching Printful order via `lib/printful.ts` — as a **draft**
+  (`confirm: false`), so it lands in the Printful dashboard for review and
+  nothing ships automatically. Flip `confirm: true` there once the pipeline
+  is trusted. A failed order-creation call is logged loudly (payment already
+  succeeded by that point) rather than silently dropped.
 - **Newsletter** adds the contact to a Resend audience, or POSTs `{ email }`
   to a generic webhook (Buttondown / ConvertKit / Zapier / Mailchimp).
 - Without any of these set, the buttons show an honest "not live yet" message.

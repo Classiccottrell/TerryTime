@@ -34,7 +34,7 @@ export const products: Product[] = [
     id: "unisex-pique-polo",
     name: "Unisex Pique Polo Shirt",
     voice: "Terry the Sketcher",
-    blurb: "Pique-knit unisex polo, black, embroidered Terry face.",
+    blurb: "Pique-knit, black. The face rides quiet until someone gets close enough to read it.",
     accent: "#1233c7",
     free: false,
     variants: [
@@ -52,7 +52,7 @@ export const products: Product[] = [
     id: "unisex-hoodie",
     name: "Unisex Hoodie",
     voice: "Terry the Sketcher",
-    blurb: "Heavyweight unisex hoodie, black, embroidered Terry face.",
+    blurb: "Heavyweight, black. Built for East Van nights, not the studio.",
     accent: "#1233c7",
     free: false,
     variants: [
@@ -70,7 +70,7 @@ export const products: Product[] = [
     id: "organic-dad-hat",
     name: "Organic Dad Hat",
     voice: "Terry the Sketcher",
-    blurb: "Organic cotton dad hat, black, embroidered Terry face.",
+    blurb: "Organic cotton, black. Low profile, permanent signal.",
     accent: "#1233c7",
     free: false,
     variants: [
