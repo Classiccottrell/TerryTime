@@ -6,7 +6,7 @@ export function ShopNavigation({ current }: { current?: string }) {
     <header className="shop-nav-shell">
       <nav className="shop-nav" aria-label="Shop design previews">
         <Link href="/shop" className="shop-nav__home">
-          Terry Time <span>/ Three Shops</span>
+          Terry Time <span>/ {shopRoutes.length} Shops</span>
         </Link>
         <ol>
           {shopRoutes.map((route) => (
