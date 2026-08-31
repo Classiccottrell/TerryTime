@@ -35,7 +35,7 @@ export default async function SuccessPage({
     <div className="mx-auto max-w-2xl px-6 py-32 text-center">
       <p className="eyebrow text-stone mb-6">Order confirmed</p>
       <p className="font-[family-name:var(--font-display)] text-7xl sm:text-9xl text-forest leading-none tracking-tight">
-        IT'S YOURS.
+        IT&apos;S YOURS.
       </p>
       <p className="mt-6 font-[family-name:var(--font-serif)] text-xl text-ink">
         {itemName ? `Your ${itemName} is on the way.` : "Your order's in. The stickers are on the way."}

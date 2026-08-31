@@ -7,7 +7,7 @@ export default function NotFound() {
         404
       </p>
       <p className="mt-4 font-[family-name:var(--font-mono)] text-lg italic text-stone">
-        “It's not here. Cut it.” — Berry, the Editor
+        “It&apos;s not here. Cut it.” — Berry, the Editor
       </p>
       <p className="mt-2 font-[family-name:var(--font-serif)] text-xl text-ink">
         This page got edited out of existence.

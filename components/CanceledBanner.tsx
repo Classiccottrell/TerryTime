@@ -17,7 +17,7 @@ export function CanceledBanner() {
   if (!canceled) return null;
 
   return (
-    <div className="mt-8 border-2 border-red bg-cloud p-4 font-[family-name:var(--font-mono)] text-sm text-ink">
+    <div className="checkout-canceled mt-8 border-2 border-red bg-cloud p-4 font-[family-name:var(--font-mono)] text-sm text-ink">
       <span className="text-red font-bold">Checkout canceled.</span> No charge. Berry says
       take your time.
     </div>

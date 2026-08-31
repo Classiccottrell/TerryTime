@@ -11,11 +11,13 @@ nothing is lost — it's just not part of this repo anymore.
 
 - **[Next.js 15](https://nextjs.org)** (App Router, React 19)
 - **[TypeScript](https://www.typescriptlang.org)** end to end
-- **[Tailwind CSS v4](https://tailwindcss.com)**, with a scoped `.shop-brutal`
-  cobalt Brutal UX design system on `/shop` (`app/globals.css`) — ported
+- **[Tailwind CSS v4](https://tailwindcss.com)**, with a scoped `.shop-design`
+  cobalt Brutal UX design system across the shop previews (`app/globals.css`) — ported
   from [Classiccottrell/Brutal-UX](https://github.com/Classiccottrell/Brutal-UX)
 
-`/` redirects straight to `/shop`. Checkout runs on Next.js route handlers
+`/` redirects straight to the `/shop` design chooser. Three live storefront
+directions share the same catalog and checkout: `/shop/city`, `/shop/archive`,
+and `/shop/shrine`. Checkout runs on Next.js route handlers
 (Node runtime); the site builds and runs with no secrets, and checkout turns
 on the moment you add a Stripe key.
 
@@ -67,22 +69,25 @@ TerryTime/
 │   ├── layout.tsx             # Minimal root layout
 │   ├── globals.css            # Base tokens + scoped .shop-brutal cobalt system
 │   ├── page.tsx                # Redirects to /shop
-│   ├── shop/page.tsx          # The shop — cobalt Brutal UX, 3-product catalog
+│   ├── shop/page.tsx          # Storefront design chooser
+│   ├── shop/city/page.tsx     # Kinetic Cobalt Relay City storefront
+│   ├── shop/archive/page.tsx  # Street Evidence Archive storefront
+│   ├── shop/shrine/page.tsx   # Minimal Signal Shrine storefront
 │   ├── shop/success/page.tsx
 │   └── api/                    # checkout, subscribe, webhook route handlers
-├── components/                 # BuyButton, CanceledBanner
-├── lib/                        # products.ts (catalog), stripe.ts, site.ts
+├── components/                 # Checkout controls, design navigation, visual effects
+├── lib/                        # Catalog, shop route registry, Stripe, site helpers
 ├── public/img/products/        # Approved local product photography (polo, hoodie, dad hat)
 └── public/img/shop/            # Shop hero collage photos, terry-face.svg mascot asset
 ```
 
 ## Design System — Brutal UX (cobalt)
 
-`/shop` opts into a scoped cobalt Brutal UX variant (`.shop-brutal`,
-`data-ink="cobalt"` in `app/shop/page.tsx`): monospace type, `#1233c7`
-cobalt ink on `#f7f6f1` warm paper, zero border-radius/shadow/transition,
-`.brutal-btn` / `.brutal-border` / `.brutal-divider` / `.brutal-input`
-utilities. Source of truth for the full system:
+The shop chooser and all three storefront directions opt into `.shop-design`:
+monospace type, `#1233c7` cobalt ink on `#f7f6f1` warm paper, zero border
+radius and zero shadow. City, Archive, and Shrine intentionally use separate
+compositions while sharing catalog, checkout, and preview navigation. Source
+of truth for the underlying system:
 [Classiccottrell/Brutal-UX](https://github.com/Classiccottrell/Brutal-UX).
 
 ## Deploy
