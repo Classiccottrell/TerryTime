@@ -46,6 +46,55 @@
   --radius: 0px; /* sharp corners — raw aesthetic */
 }
 
+/* ============================================================
+   BRUTAL UX — COBALT SHOP VARIANT (scoped to .shop-brutal)
+   Ported from Classiccottrell/Brutal-UX app/globals.css "ENFORCEMENT LAYER".
+   Deliberately scoped, not global — the checkout/marketing pages elsewhere
+   in this app keep the Moody Teal system above untouched.
+   ============================================================ */
+.shop-brutal {
+  --ink-black: #000000;
+  --ink-cobalt: #1233c7;
+  --paper-white-pure: #ffffff;
+  --paper-white-warm: #f7f6f1;
+  --brutal-black: var(--ink-black);
+  --brutal-white: var(--paper-white-pure);
+  --brutal-red: #ff0000;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  background: var(--brutal-white);
+  color: var(--brutal-black);
+}
+.shop-brutal[data-ink="cobalt"] {
+  --brutal-black: var(--ink-cobalt);
+  --brutal-white: var(--paper-white-warm);
+}
+.shop-brutal * {
+  border-radius: 0 !important;
+  transition: none !important;
+  animation-duration: 0s !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+.shop-brutal .brutal-border { border: 2px solid var(--brutal-black); }
+.shop-brutal .brutal-divider { border-top: 3px solid var(--brutal-black); }
+.shop-brutal .brutal-btn {
+  border: 2px solid var(--brutal-black);
+  background: var(--brutal-white);
+  color: var(--brutal-black);
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.5rem 1rem;
+}
+.shop-brutal .brutal-btn:hover { background: var(--brutal-black); color: var(--brutal-white); }
+.shop-brutal .brutal-btn:active { background: var(--brutal-red); color: var(--brutal-white); border-color: var(--brutal-red); }
+.shop-brutal .brutal-input {
+  border: 2px solid var(--brutal-black);
+  background: var(--brutal-white);
+  color: var(--brutal-black);
+  padding: 0.5rem;
+}
+.shop-brutal .brutal-input:focus { outline: 3px solid var(--brutal-black); outline-offset: 0; }
+
 @layer base {
   html {
     scroll-behavior: smooth;
