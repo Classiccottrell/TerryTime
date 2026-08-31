@@ -4,6 +4,8 @@ import Image from "next/image";
 import { products } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 import { CanceledBanner } from "@/components/CanceledBanner";
+import { TronGrid } from "@/components/TronGrid";
+import { Mascot3D } from "@/components/Mascot3D";
 
 export const metadata: Metadata = {
   title: "Shop",
@@ -17,6 +19,8 @@ const catalog = products;
 export default function ShopPage() {
   return (
     <div className="shop-brutal" data-ink="cobalt">
+      <TronGrid />
+
       {/* ---- Header: wordmark + nav ---- */}
       <header className="brutal-border border-x-0 border-t-0 sticky top-0 z-40 bg-[var(--brutal-white)]">
         <div className="mx-auto max-w-[1400px] px-6 py-4 flex items-center justify-between">
@@ -68,6 +72,11 @@ export default function ShopPage() {
               alt="East Van skyline at dusk"
               className="absolute left-[18%] bottom-0 w-[55%] h-[48%] rotate-1 z-10"
             />
+            {/* The mascot lives in the grid scene, not the photo collage:
+                a 3D-tilt card floating over the Tron grid, cursor-reactive. */}
+            <div className="brutal-border absolute right-4 bottom-[-28px] w-[34%] aspect-square z-40 bg-[var(--brutal-white)]">
+              <Mascot3D />
+            </div>
           </div>
         </div>
       </section>
@@ -75,7 +84,7 @@ export default function ShopPage() {
       <CanceledBanner />
 
       {/* ---- Product list: indexed, asymmetric two-column ---- */}
-      <section className="mx-auto max-w-[1400px] px-6 pb-24">
+      <section className="relative bg-[var(--brutal-white)] mx-auto max-w-[1400px] px-6 pb-24 pt-2">
         <div className="brutal-divider mb-10" />
         <div className="grid gap-10 md:grid-cols-2">
           {catalog.map((p, i) => (
@@ -85,7 +94,7 @@ export default function ShopPage() {
       </section>
 
       {/* ---- Footer ---- */}
-      <footer className="brutal-border border-x-0 border-b-0">
+      <footer className="relative brutal-border border-x-0 border-b-0 bg-[var(--brutal-white)]">
         <div className="mx-auto max-w-[1400px] px-6 py-10 flex flex-wrap items-center justify-between gap-4 text-xs font-bold uppercase tracking-widest">
           <span>&copy; {new Date().getFullYear()} Terry Time</span>
           <div className="flex gap-6">

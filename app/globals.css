@@ -61,8 +61,17 @@
   --brutal-white: var(--paper-white-pure);
   --brutal-red: #ff0000;
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  background: var(--brutal-white);
+  /* No background here on purpose — TronGrid renders as a fixed layer
+     behind this element; header/product/footer sections opt back into
+     an opaque background individually so the grid stays visible in the
+     hero without hurting text legibility elsewhere. */
+  background: transparent;
   color: var(--brutal-black);
+  position: relative;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascot3d-face { transform: none !important; }
 }
 .shop-brutal[data-ink="cobalt"] {
   --brutal-black: var(--ink-cobalt);
