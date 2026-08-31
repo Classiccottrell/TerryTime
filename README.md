@@ -1,7 +1,7 @@
 # TerryTime Shop
 
-TerryTime's checkout-only site: a Next.js shop selling the real Terry Store
-catalog from Printful, with Stripe checkout. Everything that isn't the
+TerryTime's checkout-only site: a Next.js shop selling real Terry Store
+merch from Printful, with Stripe checkout. Everything that isn't the
 checkout flow (marketing pages, character pages, manifesto, community,
 design system, and every experimental branch) has been moved to a separate
 archive repo, https://github.com/Classiccottrell/terry-site-tryouts, so
@@ -31,12 +31,14 @@ on the moment you add a Stripe key.
   no Stripe dashboard product setup is needed — just a secret key. Catalog
   and prices live in `lib/products.ts` (`priceCents`, CAD). Success →
   `/shop/success`, cancel → `/shop?canceled=1`.
-- **Printful** — the full catalog in `lib/products.ts` is pulled from the
-  live Terry Store on Printful (store ID `18616880`) via the Printful API.
-  `PRINTFUL_API_KEY` (an all-access token) lives in `.env.local` (gitignored;
-  see `.env.example` for the var name). Each product/variant carries a
-  `printfulVariantId` for future order-fulfilment wiring — `app/api/webhook`
-  doesn't call Printful yet, that's a TODO.
+- **Printful** — the Terry Store on Printful (store ID `18616880`) has more
+  products than are listed here; `lib/products.ts` is deliberately trimmed
+  to the 3 with approved local product photography (polo, hoodie, dad hat —
+  `public/img/products/`). `PRINTFUL_API_KEY` (an all-access token) lives in
+  `.env.local` (gitignored; see `.env.example` for the var name) and can pull
+  the rest of the catalog when their photography is ready. Each variant
+  carries a `printfulVariantId` for future order-fulfilment wiring —
+  `app/api/webhook` doesn't call Printful yet, that's a TODO.
 - **Webhook** verifies the signature and logs `checkout.session.completed`;
   drop the Printful order-creation call where the `TODO` is in
   `app/api/webhook/route.ts`.
@@ -65,11 +67,12 @@ TerryTime/
 │   ├── layout.tsx             # Minimal root layout
 │   ├── globals.css            # Base tokens + scoped .shop-brutal cobalt system
 │   ├── page.tsx                # Redirects to /shop
-│   ├── shop/page.tsx          # The shop — cobalt Brutal UX, full Printful catalog
+│   ├── shop/page.tsx          # The shop — cobalt Brutal UX, 3-product catalog
 │   ├── shop/success/page.tsx
 │   └── api/                    # checkout, subscribe, webhook route handlers
 ├── components/                 # BuyButton, CanceledBanner
-├── lib/                        # products.ts (Printful catalog), stripe.ts, site.ts
+├── lib/                        # products.ts (catalog), stripe.ts, site.ts
+├── public/img/products/        # Approved local product photography (polo, hoodie, dad hat)
 └── public/img/shop/            # Shop hero collage photos, terry-face.svg mascot asset
 ```
 
