@@ -2,15 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { products } from "@/lib/products";
-import { BuyButton } from "@/components/BuyButton";
+import { ProductCard } from "@/components/ProductCard";
 import { CanceledBanner } from "@/components/CanceledBanner";
 
 export const metadata: Metadata = {
   title: "Shop",
-  description: "Terry stickers and merch — the full live Printful catalog, Stripe checkout.",
+  description: "Terry stickers and merch — 6 real Printful products, Stripe checkout.",
 };
 
-// Full live Printful catalog (see lib/products.ts).
+// Full live Printful catalog (see lib/products.ts) — 6 products, some with
+// size/color variants selectable on the card.
 const catalog = products;
 
 export default function ShopPage() {
@@ -78,32 +79,7 @@ export default function ShopPage() {
         <div className="brutal-divider mb-10" />
         <div className="grid gap-10 md:grid-cols-2">
           {catalog.map((p, i) => (
-            <article
-              key={p.id}
-              className={`brutal-border p-6 flex flex-col gap-4 ${
-                i % 2 === 1 ? "md:mt-16" : ""
-              }`}
-            >
-              <div className="flex items-baseline justify-between">
-                <span className="text-sm font-bold tracking-widest">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span className="text-lg font-bold">{p.price}</span>
-              </div>
-              <div className="relative w-full aspect-square brutal-border">
-                <Image
-                  src={p.image ?? `/img/products/${p.id}.svg`}
-                  alt={p.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-contain p-4"
-                  unoptimized={Boolean(p.image?.startsWith("http"))}
-                />
-              </div>
-              <h3 className="text-2xl font-bold uppercase tracking-tight">{p.name}</h3>
-              <p className="text-sm leading-relaxed flex-1">{p.blurb}</p>
-              <BuyButton product={p} />
-            </article>
+            <ProductCard key={p.id} product={p} index={i} />
           ))}
         </div>
       </section>

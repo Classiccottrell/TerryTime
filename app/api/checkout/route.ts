@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStripe, CURRENCY } from "@/lib/stripe";
-import { getProduct } from "@/lib/products";
+import { getVariant } from "@/lib/products";
 
 export const runtime = "nodejs";
 
@@ -36,11 +36,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const product = productId ? getProduct(productId) : undefined;
-  if (!product) {
+  const found = productId ? getVariant(productId) : undefined;
+  if (!found) {
     return NextResponse.json({ error: "Unknown product." }, { status: 404 });
   }
-  if (product.free || product.priceCents <= 0) {
+  const { product, variant } = found;
+  if (product.free || variant.priceCents <= 0) {
     return NextResponse.json(
       { error: "This item is free — just download it." },
       { status: 400 }
@@ -58,17 +59,17 @@ export async function POST(req: Request) {
           // Inline price_data so no Stripe dashboard setup is needed — only a key.
           price_data: {
             currency: CURRENCY,
-            unit_amount: product.priceCents,
+            unit_amount: variant.priceCents,
             product_data: {
-              name: product.name,
-              description: `${product.voice} — ${product.count}`,
+              name: `${product.name} — ${variant.label}`,
+              description: `${product.voice} — Printful variant ${variant.printfulVariantId}`,
             },
           },
         },
       ],
       // Stickers ship — collect an address.
       shipping_address_collection: { allowed_countries: ["CA", "US"] },
-      metadata: { productId: product.id },
+      metadata: { productId: product.id, variantId: variant.id, printfulVariantId: String(variant.printfulVariantId) },
       success_url: `${origin}/shop/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/shop?canceled=1`,
     });

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { Product } from "@/lib/products";
+import type { Product, Variant } from "@/lib/products";
 import { asset, isStaticExport } from "@/lib/site";
 
-export function BuyButton({ product }: { product: Product }) {
+export function BuyButton({ product, variant }: { product: Product; variant: Variant }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,7 +15,7 @@ export function BuyButton({ product }: { product: Product }) {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: product.id }),
+        body: JSON.stringify({ productId: variant.id }),
       });
       const data = await res.json();
       if (!res.ok || !data.url) {
@@ -50,7 +50,7 @@ export function BuyButton({ product }: { product: Product }) {
         title={isStaticExport ? "Checkout runs on the live site" : undefined}
         className="w-full border border-ink bg-ink px-6 py-3 font-[family-name:var(--font-grotesk)] text-sm font-bold uppercase tracking-widest text-paper transition-colors hover:bg-red hover:border-red disabled:opacity-60"
       >
-        {loading ? "Starting…" : `Buy — ${product.price}`}
+        {loading ? "Starting…" : `Buy — ${variant.price}`}
       </button>
       {isStaticExport ? (
         <p className="mt-2 font-[family-name:var(--font-spacemono)] text-xs text-stone">
