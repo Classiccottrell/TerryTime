@@ -15,9 +15,9 @@ nothing is lost — it's just not part of this repo anymore.
   cobalt Brutal UX design system across the shop previews (`app/globals.css`) — ported
   from [Classiccottrell/Brutal-UX](https://github.com/Classiccottrell/Brutal-UX)
 
-`/` redirects straight to the `/shop` design chooser. Four live storefront
+`/` redirects straight to the `/shop` design chooser. Five live storefront
 directions share the same catalog and checkout: `/shop/city`, `/shop/archive`,
-`/shop/shrine`, and `/shop/grid`. Checkout runs on Next.js route handlers
+`/shop/shrine`, `/shop/grid`, and `/shop/stencil`. Checkout runs on Next.js route handlers
 (Node runtime); the site builds and runs with no secrets, and checkout turns
 on the moment you add a Stripe key.
 
@@ -77,6 +77,7 @@ TerryTime/
 │   ├── shop/archive/page.tsx  # Street Evidence Archive storefront
 │   ├── shop/shrine/page.tsx   # Minimal Signal Shrine storefront
 │   ├── shop/grid/page.tsx     # Terminal Grid — dense, edge-to-edge catalog
+│   ├── shop/stencil/page.tsx  # Wheatpaste Stencil — street posters / flyers
 │   ├── shop/success/page.tsx
 │   └── api/                    # checkout, subscribe, webhook route handlers
 ├── components/                 # Checkout controls, design navigation, visual effects
@@ -87,12 +88,13 @@ TerryTime/
 
 ## Design System — Brutal UX (cobalt)
 
-The shop chooser and all four storefront directions opt into `.shop-design`:
+The shop chooser and all five storefront directions opt into `.shop-design`:
 monospace type, `#1233c7` cobalt ink on `#f7f6f1` warm paper, zero border
-radius and zero shadow. City, Archive, Shrine, and Grid intentionally use
+radius and zero shadow. City, Archive, Shrine, Grid, and Stencil intentionally use
 separate compositions while sharing catalog, checkout, and preview
 navigation — Grid (`supreme.com`-inspired) skips the collage/hero flourish
-entirely for a dense, edge-to-edge product grid. Source of truth for the
+entirely for a dense, edge-to-edge product grid; Stencil treats each product as a
+wheatpaste flyer with stacked poster sheets. Source of truth for the
 underlying system:
 [Classiccottrell/Brutal-UX](https://github.com/Classiccottrell/Brutal-UX).
 
