@@ -357,6 +357,11 @@
 .shop-choice--5 .shop-choice__art i { position: static; height: auto; background: currentColor; opacity: 0.9; }
 .shop-choice--5 .shop-choice__art i:nth-child(1) { opacity: 0.25; transform: rotate(-2deg); }
 .shop-choice--5 .shop-choice__art i:nth-child(2) { opacity: 0.55; transform: rotate(1deg); }
+.shop-choice--6 .shop-choice__art { display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 0 14%; }
+.shop-choice--6 .shop-choice__art i { position: static; height: 2px; background: currentColor; }
+.shop-choice--6 .shop-choice__art i:nth-child(1) { width: 100%; }
+.shop-choice--6 .shop-choice__art i:nth-child(2) { width: 62%; height: 10px; }
+.shop-choice--6 .shop-choice__art i:nth-child(3) { width: 100%; }
 .shop-choice--5 .shop-choice__art i:nth-child(3) { opacity: 1; }
 .shop-choice__copy { display: flex; flex-direction: column; gap: 0.8rem; padding: 1.5rem 3vw; }
 .shop-choice__copy strong { font-size: clamp(1.7rem, 4vw, 4.2rem); letter-spacing: -0.065em; line-height: 0.95; text-transform: uppercase; }
@@ -731,6 +736,112 @@
   text-decoration: none;
 }
 
+/* ---- 06 — Newsstand Kiosk — serif editorial, ink-field page, classified-ad
+   listing rhythm. Same cobalt/paper lock, inverted: full-bleed ink ground
+   with paper type, where City/Archive/Shrine/Grid/Stencil stay paper-ground.
+   Typography breaks from the mono system shared everywhere else on purpose —
+   serif display + serif body, no mono anywhere in this direction. ---- */
+.shop-kiosk {
+  background: var(--shop-ink);
+  color: var(--shop-paper);
+  font-family: ui-serif, Georgia, "Times New Roman", serif;
+}
+.shop-kiosk .shop-nav-shell,
+.shop-kiosk .shop-nav {
+  background: var(--shop-ink);
+  border-color: var(--shop-paper);
+}
+.shop-kiosk .shop-nav__home,
+.shop-kiosk .shop-nav li a {
+  color: var(--shop-paper);
+}
+.shop-kiosk .shop-nav li,
+.shop-kiosk .shop-nav__home {
+  border-color: var(--shop-paper);
+}
+.shop-kiosk .shop-nav li a:hover,
+.shop-kiosk .shop-nav li a[aria-current="page"] {
+  background: var(--shop-paper);
+  color: var(--shop-ink);
+}
+.shop-kiosk h1, .shop-kiosk h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: -0.02em;
+  line-height: 0.94;
+  font-weight: 400;
+}
+.kiosk-masthead {
+  border-bottom: 3px double var(--shop-paper);
+  padding: clamp(2.5rem, 7vw, 6rem) clamp(1rem, 4vw, 4rem) clamp(2rem, 5vw, 3.5rem);
+}
+.kiosk-masthead .shop-kicker { color: var(--shop-paper); opacity: 0.75; }
+.kiosk-masthead h1 { margin: 0.8rem 0 1.4rem; font-size: clamp(2.6rem, 7vw, 5.5rem); max-width: 20ch; }
+.kiosk-masthead__lede { max-width: 52ch; font-size: 1rem; line-height: 1.7; }
+.shop-kiosk .shop-canceled-banner { border-color: var(--shop-paper); color: var(--shop-paper); }
+
+.kiosk-classifieds {
+  display: grid;
+  border-top: 1px solid var(--shop-paper);
+}
+.kiosk-listing {
+  display: grid;
+  grid-template-columns: 4rem minmax(220px, 0.9fr) 1.6fr;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  align-items: start;
+  border-bottom: 1px solid var(--shop-paper);
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 4vw, 4rem);
+}
+.kiosk-listing__index {
+  font-family: ui-monospace, monospace;
+  font-size: 0.7rem;
+  opacity: 0.6;
+  letter-spacing: 0.08em;
+}
+.kiosk-listing__image {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  filter: grayscale(1) contrast(1.15);
+}
+.kiosk-listing__image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--shop-paper);
+  pointer-events: none;
+}
+.kiosk-listing__copy h2 {
+  margin: 0 0 0.9rem;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+}
+.kiosk-listing__copy > p:not(.shop-kicker) {
+  max-width: 48ch;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+/* Disabled BuyButton on the ink ground: shared rule (globals `.shop-purchase
+   button:disabled`) only drops opacity, which reads as "still clickable" on
+   an inverted field — this direction needs its own, real state change. */
+.shop-kiosk .shop-purchase button:disabled {
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+  background: var(--shop-ink) !important;
+  color: var(--shop-paper) !important;
+  border: 2px dashed var(--shop-paper) !important;
+}
+.shop-kiosk .shop-purchase button:disabled:hover {
+  background: var(--shop-ink) !important;
+  color: var(--shop-paper) !important;
+}
+.kiosk-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 3px double var(--shop-paper);
+  padding: 1.2rem clamp(1rem, 4vw, 4rem);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
 /* ---- Order confirmation — shared across every direction, no chooser context ---- */
 .shop-success { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; min-height: 100vh; padding: 4rem 1.5rem; text-align: center; }
 .shop-success h1 { margin: 0; font-size: clamp(3rem, 9vw, 6rem); font-weight: 900; text-transform: uppercase; }
@@ -822,6 +933,10 @@
   .stencil-flyer__edge { display: none; }
   .stencil-footer { grid-template-columns: 1fr; gap: 2.5rem; }
   .stencil-footer > div { align-items: flex-start; }
+
+  .kiosk-listing { grid-template-columns: 1fr; }
+  .kiosk-listing__index { display: none; }
+  .kiosk-footer { flex-direction: column; gap: 0.5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
