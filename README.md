@@ -83,7 +83,8 @@ TerryTime/
 ├── components/                 # Checkout controls, design navigation, visual effects
 ├── lib/                        # Catalog, shop route registry, Stripe, site helpers
 ├── public/img/products/        # Approved local product photography (polo, hoodie, dad hat)
-└── public/img/shop/            # Shop hero collage photos, terry-face.svg mascot asset
+├── public/img/shop/            # Shop hero collage photos, terry-face.svg mascot asset
+└── public/models/               # custom-holographic.glb — Three.js Mascot3D model
 ```
 
 ## Design System — Brutal UX (cobalt)
