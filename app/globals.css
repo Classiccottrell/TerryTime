@@ -276,28 +276,18 @@
 .shop-design .checkout-canceled { margin: 0; border-color: var(--shop-ink); background: var(--shop-paper); color: var(--shop-ink); }
 .shop-design .checkout-canceled .text-red { color: var(--shop-ink); }
 
-/* Layered Terry face */
-.mascot3d-stack {
+/* Terry mascot: Three.js glb viewer */
+.mascot3d-wrap {
   position: relative;
   width: 100%;
   height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 180ms ease-out;
-  will-change: transform;
+  min-height: 1px;
 }
-.mascot3d-face {
-  position: absolute;
-  inset: 3%;
+.mascot3d-wrap canvas {
   display: block;
-  background: var(--shop-ink, #1233c7);
-  -webkit-mask: url("/img/terry-face.svg") center / contain no-repeat;
-  mask: url("/img/terry-face.svg") center / contain no-repeat;
+  width: 100%;
+  height: 100%;
 }
-.mascot3d-face--4 { opacity: 0.14; transform: translate3d(-24px, 24px, -48px); }
-.mascot3d-face--3 { opacity: 0.22; transform: translate3d(-18px, 18px, -36px); }
-.mascot3d-face--2 { opacity: 0.34; transform: translate3d(-12px, 12px, -24px); }
-.mascot3d-face--1 { opacity: 0.55; transform: translate3d(-6px, 6px, -12px); }
-.mascot3d-face--front { transform: translateZ(0); }
 
 /* Shop chooser */
 .shop-chooser { display: grid; grid-template-rows: auto auto 1fr auto; min-height: 100svh; }
@@ -941,5 +931,4 @@
 
 @media (prefers-reduced-motion: reduce) {
   .shop-design *, .shop-design *::before, .shop-design *::after { animation: none !important; transition: none !important; }
-  .mascot3d-stack { transform: none !important; }
 }
