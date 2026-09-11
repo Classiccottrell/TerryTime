@@ -32,7 +32,6 @@ export default function GridShopPage() {
                 fill
                 sizes="(max-width: 640px) 50vw, 33vw"
                 className="object-contain"
-                unoptimized
               />
             </div>
             <div className="grid-item__caption">

@@ -4,7 +4,7 @@ import { shopRoutes } from "@/lib/shop-routes.mjs";
 
 export const metadata: Metadata = {
   title: "Choose a Shop",
-  description: "Five distinct Terry Time storefront directions.",
+  description: "Six distinct Terry Time storefront directions.",
 };
 
 export default function ShopChooserPage() {
@@ -16,10 +16,10 @@ export default function ShopChooserPage() {
       </header>
 
       <section className="shop-chooser__intro" aria-labelledby="chooser-title">
-        <p className="shop-kicker">Five stores. Same evidence.</p>
+        <p className="shop-kicker">Six stores. Same evidence.</p>
         <h1 id="chooser-title">Choose your<br />Terry Time.</h1>
         <p>
-          One catalog, five different signals. Walk through each before picking a wall.
+          One catalog, six different signals. Walk through each before picking a wall.
         </p>
       </section>
 
@@ -43,7 +43,7 @@ export default function ShopChooserPage() {
 
       <footer className="shop-chooser__footer">
         <span>Approved local objects / Stripe checkout</span>
-        <span>01—05</span>
+        <span>01—06</span>
       </footer>
     </main>
   );

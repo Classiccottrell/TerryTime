@@ -37,7 +37,6 @@ export default function KioskShopPage() {
                 fill
                 sizes="(max-width: 760px) 100vw, 40vw"
                 className="object-contain"
-                unoptimized
               />
             </div>
             <div className="kiosk-listing__copy">

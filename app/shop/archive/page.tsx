@@ -70,7 +70,6 @@ export default function ArchiveShopPage() {
                   fill
                   sizes="(max-width: 700px) 90vw, 38vw"
                   className="object-contain"
-                  unoptimized
                 />
               </div>
               <div className="archive-dossier__copy">

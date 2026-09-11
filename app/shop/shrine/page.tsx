@@ -42,7 +42,6 @@ export default function ShrineShopPage() {
                 fill
                 sizes="(max-width: 700px) 94vw, 55vw"
                 className="object-contain"
-                unoptimized
               />
             </div>
             <div className="shrine-artifact__copy">

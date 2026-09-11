@@ -26,7 +26,7 @@ export default function CityShopPage() {
       <ShopNavigation current="city" />
 
       <section className="city-hero" aria-labelledby="city-title">
-        <div className="city-hero__signal" aria-hidden="true">
+        <div className="city-hero__signal">
           <span>49.2819° N</span>
           <i />
           <span>123.1080° W</span>
@@ -41,7 +41,7 @@ export default function CityShopPage() {
           <Mascot3D />
           <p>Signal strength / 100%</p>
         </div>
-        <div className="city-hero__route" aria-hidden="true">
+        <div className="city-hero__route">
           <span>Commercial</span><i /><span>Broadway</span><i /><span>Main</span>
         </div>
       </section>
@@ -75,7 +75,6 @@ export default function CityShopPage() {
                   fill
                   sizes="(max-width: 700px) 90vw, 42vw"
                   className="object-contain"
-                  unoptimized
                 />
                 <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
               </div>

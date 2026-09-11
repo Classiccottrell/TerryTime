@@ -28,7 +28,6 @@ export function ProductCard({ product, index }: { product: Product; index: numbe
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
           className="object-contain p-4"
-          unoptimized
         />
       </div>
 

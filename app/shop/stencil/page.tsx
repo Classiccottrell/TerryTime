@@ -55,7 +55,6 @@ export default function StencilShopPage() {
               width={280}
               height={280}
               className="stencil-sheet__face"
-              unoptimized
             />
           </div>
         </div>
@@ -98,7 +97,6 @@ export default function StencilShopPage() {
                   fill
                   sizes="(max-width: 700px) 92vw, 38vw"
                   className="object-contain"
-                  unoptimized
                 />
               </div>
 
