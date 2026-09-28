@@ -1,0 +1,16 @@
+{
+  "model": "organic-dad-hat.glb",
+  "bytes": 1255228,
+  "size_mb": 1.197,
+  "triangles": 34572,
+  "meshes": 3,
+  "materials": 2,
+  "max_texture_px": 0,
+  "extensions": [
+    "KHR_mesh_quantization"
+  ],
+  "generator": "glTF-Transform v4.5.0",
+  "checked": "2026-09-24",
+  "gate": "tools/glb_gate.sh against glb-budget.json",
+  "verified_in_browser": true
+}

@@ -1,0 +1,16 @@
+{
+  "model": "unisex-pique-polo.glb",
+  "bytes": 166200,
+  "size_mb": 0.159,
+  "triangles": 9128,
+  "meshes": 2,
+  "materials": 2,
+  "max_texture_px": 0,
+  "extensions": [
+    "KHR_mesh_quantization"
+  ],
+  "generator": "glTF-Transform v4.5.0",
+  "checked": "2026-09-24",
+  "gate": "tools/glb_gate.sh against glb-budget.json",
+  "verified_in_browser": true
+}

@@ -1,0 +1,9 @@
+{
+  "max_bytes": 3145728,
+  "max_triangles": 150000,
+  "max_texture_px": 2048,
+  "forbidden_extensions": ["KHR_materials_sheen"],
+  "max_bytes_overrides": {
+    "custom-holographic.glb": 3177024
+  }
+}

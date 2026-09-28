@@ -1,0 +1,16 @@
+{
+  "model": "unisex-hoodie.glb",
+  "bytes": 206032,
+  "size_mb": 0.196,
+  "triangles": 10176,
+  "meshes": 2,
+  "materials": 2,
+  "max_texture_px": 0,
+  "extensions": [
+    "KHR_mesh_quantization"
+  ],
+  "generator": "glTF-Transform v4.5.0",
+  "checked": "2026-09-24",
+  "gate": "tools/glb_gate.sh against glb-budget.json",
+  "verified_in_browser": true
+}

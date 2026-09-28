@@ -85,8 +85,21 @@ TerryTime/
 ├── lib/                        # Catalog, shop route registry, Stripe, site helpers
 ├── public/img/products/        # Approved local product photography (polo, hoodie, dad hat)
 ├── public/img/shop/            # Shop hero collage photos, terry-face.svg mascot asset
-└── public/models/               # custom-holographic.glb — Three.js Mascot3D model
+└── public/models/               # Mascot and three merch GLBs with budget sidecars
 ```
+
+## 3D product assets
+
+`public/models/` contains the dad hat, hoodie, and polo GLBs alongside their
+`*.budget.json` inspection records. They match the three IDs in
+`lib/products.ts` and can be loaded from `/models/<product-id>.glb` with the
+site's existing Three.js `GLTFLoader` setup. The storefronts continue to use
+the approved product photography until a product viewer is added.
+
+Run `bash tools/glb_gate.sh` from the repo root to validate every GLB against
+`glb-budget.json`. The 3 MiB default applies to the merch assets. The existing
+mascot is held to its current 3,177,024-byte size with a file-specific limit;
+this allows the gate to check the whole directory without changing that asset.
 
 ## Design System — Brutal UX (cobalt)
 
