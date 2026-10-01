@@ -221,6 +221,7 @@
 .shop-nav a { text-decoration: none; }
 .shop-nav__home {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   border-right: 2px solid var(--shop-ink);
   padding: 0.8rem clamp(1rem, 3vw, 2.4rem);
@@ -231,12 +232,15 @@
   white-space: nowrap;
 }
 .shop-nav__home span { margin-left: 0.5rem; font-weight: 400; }
-.shop-nav ol { display: flex; align-items: stretch; margin: 0; padding: 0; list-style: none; }
-.shop-nav li { display: flex; border-left: 1px solid var(--shop-ink); }
+/* The store list scrolls sideways whenever the row runs out of width (tablet
+   and phone), so no store link is ever clipped off-screen by `.shop-design`. */
+.shop-nav ol { display: flex; align-items: stretch; min-width: 0; margin: 0; padding: 0; list-style: none; overflow-x: auto; scrollbar-width: thin; }
+.shop-nav li { display: flex; flex-shrink: 0; border-left: 1px solid var(--shop-ink); }
 .shop-nav li a {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  white-space: nowrap;
   padding: 0.8rem clamp(0.8rem, 2vw, 1.7rem);
   font-size: 0.68rem;
   font-weight: 800;
@@ -245,6 +249,20 @@
 }
 .shop-nav li a span { font-size: 0.58rem; font-weight: 400; }
 .shop-nav li a:hover, .shop-nav li a[aria-current="page"] { background: var(--shop-ink); color: var(--shop-paper); }
+.shop-nav__links { display: flex; flex: 0 1 auto; align-items: stretch; min-width: 0; }
+.shop-nav__lifestyle {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  border-left: 2px solid var(--shop-ink);
+  padding: 0.8rem clamp(0.9rem, 2vw, 1.7rem);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.shop-nav__lifestyle:hover, .shop-nav__lifestyle[aria-current="page"] { background: var(--shop-ink); color: var(--shop-paper); }
 
 /* Shared checkout surface */
 .shop-design .shop-purchase { margin-top: auto; }
@@ -353,11 +371,15 @@
 .shop-choice--6 .shop-choice__art i:nth-child(2) { width: 62%; height: 10px; }
 .shop-choice--6 .shop-choice__art i:nth-child(3) { width: 100%; }
 .shop-choice--5 .shop-choice__art i:nth-child(3) { opacity: 1; }
+.shop-choice--7 .shop-choice__art i:nth-child(1) { left: 24%; right: 24%; top: 12px; height: 8px; background: currentColor; }
+.shop-choice--7 .shop-choice__art i:nth-child(2) { left: 32%; right: 32%; top: 20px; bottom: -2px; border-top: 0; padding: 12px 14% 38px; background: repeating-linear-gradient(currentColor 0 1px, transparent 1px 10px) content-box; }
+.shop-choice--7 .shop-choice__art i:nth-child(3) { left: calc(32% + 12px); right: calc(32% + 12px); bottom: 12px; height: 18px; border: 0; background: repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 3px, currentColor 3px 4px, transparent 4px 7px); }
 .shop-choice__copy { display: flex; flex-direction: column; gap: 0.8rem; padding: 1.5rem 3vw; }
 .shop-choice__copy strong { font-size: clamp(1.7rem, 4vw, 4.2rem); letter-spacing: -0.065em; line-height: 0.95; text-transform: uppercase; }
 .shop-choice__copy small { font-size: 0.7rem; line-height: 1.5; }
 .shop-choice__arrow { font-size: 1.8rem; }
 .shop-chooser__footer { border-top: 1px solid var(--shop-ink); border-bottom: 0; }
+.shop-chooser__footer a { border-bottom: 1px solid currentColor; text-decoration: none; }
 
 /* 01 — Cobalt Relay City */
 .shop-city { background: transparent; }
@@ -742,15 +764,18 @@
   border-color: var(--shop-paper);
 }
 .shop-kiosk .shop-nav__home,
-.shop-kiosk .shop-nav li a {
+.shop-kiosk .shop-nav li a,
+.shop-kiosk .shop-nav__lifestyle {
   color: var(--shop-paper);
 }
 .shop-kiosk .shop-nav li,
-.shop-kiosk .shop-nav__home {
+.shop-kiosk .shop-nav__home,
+.shop-kiosk .shop-nav__lifestyle {
   border-color: var(--shop-paper);
 }
 .shop-kiosk .shop-nav li a:hover,
-.shop-kiosk .shop-nav li a[aria-current="page"] {
+.shop-kiosk .shop-nav li a[aria-current="page"],
+.shop-kiosk .shop-nav__lifestyle:hover {
   background: var(--shop-paper);
   color: var(--shop-ink);
 }
@@ -832,6 +857,202 @@
   letter-spacing: 0.04em;
 }
 
+/* ---- 07 — Corner Store Receipt — one long thermal tape on an ink counter.
+   Split layout: paper intro pinned left, the receipt printing down a
+   halftone ink field on the right. The torn bottom edge is a CSS mask and
+   the print-in is a stepped clip, so it reads line by line like a register. ---- */
+.shop-receipt { background: var(--shop-paper); }
+.receipt-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  border-bottom: 2px solid var(--shop-ink);
+}
+.receipt-intro {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 3rem;
+  padding: clamp(2.5rem, 6vw, 5.5rem) clamp(1rem, 4vw, 4rem) clamp(2rem, 4vw, 3.5rem);
+}
+.receipt-intro h1 { margin: 1.3rem 0 2rem; font-size: clamp(3.6rem, 7vw, 7.6rem); text-transform: uppercase; }
+.receipt-intro__lede { max-width: 38ch; margin-bottom: 1.2rem; font-size: 0.78rem; line-height: 1.7; }
+.receipt-sign {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  width: fit-content;
+  border: 3px solid var(--shop-ink);
+  padding: 1rem 1.4rem 1.1rem;
+}
+.receipt-sign strong { font-size: clamp(2.6rem, 5vw, 4.4rem); font-weight: 900; letter-spacing: -0.06em; line-height: 0.85; text-transform: uppercase; }
+.receipt-sign > span:last-child { grid-column: 1 / -1; border-top: 1px solid var(--shop-ink); padding-top: 0.6rem; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
+.receipt-sign__light { width: 12px; height: 12px; background: var(--shop-ink); animation: receiptBlink 2.4s steps(2, jump-none) infinite; }
+@keyframes receiptBlink { 50% { opacity: 0.15; } }
+.receipt-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--shop-ink);
+  background-image: radial-gradient(color-mix(in srgb, var(--shop-paper) 24%, transparent) 1.2px, transparent 1.7px);
+  background-size: 14px 14px;
+  padding: clamp(2.5rem, 5vw, 4.5rem) clamp(1rem, 4vw, 4rem) clamp(4rem, 8vw, 7rem);
+}
+.receipt-printer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(100%, 480px);
+  border: 2px solid var(--shop-paper);
+  background: var(--shop-ink);
+  color: var(--shop-paper);
+  padding: 0.9rem 1rem;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+.receipt-printer__slot { flex: 1; height: 6px; background: var(--shop-paper); }
+.receipt-tape {
+  --tooth: 14px;
+  width: min(100%, 420px);
+  margin-top: -8px; /* tuck the tilted top edge under the printer slot */
+  background: var(--shop-paper);
+  color: var(--shop-ink);
+  padding: 1.8rem 1.6rem calc(2.2rem + var(--tooth));
+  transform: rotate(-0.6deg);
+  transform-origin: top center;
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / var(--tooth) 100%;
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / var(--tooth) 100%;
+  animation: receiptPrint 1.4s steps(18, end) both;
+}
+@keyframes receiptPrint {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+.receipt-tape__header {
+  border-bottom: 1px dashed currentColor;
+  padding-bottom: 1.2rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.7;
+  text-align: center;
+  text-transform: uppercase;
+}
+.receipt-tape__header h2 { margin-bottom: 0.9rem; font-size: 1.9rem; letter-spacing: -0.05em; line-height: 0.9; text-transform: uppercase; }
+.receipt-items { margin: 0; padding: 0; list-style: none; }
+.receipt-item { display: flex; flex-direction: column; border-bottom: 1px dashed currentColor; padding: 1.4rem 0 1.6rem; }
+.receipt-line { display: flex; align-items: baseline; gap: 0.6rem; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; }
+.receipt-line h3 { font-size: inherit; letter-spacing: 0.02em; line-height: 1.3; }
+.receipt-line i { flex: 1; min-width: 1rem; border-bottom: 2px dotted currentColor; transform: translateY(-0.25em); }
+.receipt-line span:last-child { white-space: nowrap; }
+.receipt-item__image { position: relative; aspect-ratio: 5 / 4; margin: 1rem 0 0.9rem; mix-blend-mode: multiply; }
+.receipt-item__meta { font-size: 0.58rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.receipt-item__blurb { margin-top: 0.5rem; font-size: 0.7rem; line-height: 1.6; }
+.receipt-totals { margin: 1.2rem 0 0; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+.receipt-totals div { display: flex; justify-content: space-between; gap: 1rem; padding: 0.3rem 0; }
+.receipt-totals dd { margin: 0; }
+.receipt-totals .receipt-totals__grand { margin-top: 0.5rem; border-top: 3px double currentColor; border-bottom: 3px double currentColor; padding: 0.7rem 0; font-size: 1.05rem; letter-spacing: -0.02em; }
+.receipt-tape__note { margin-top: 0.8rem; font-size: 0.6rem; line-height: 1.5; }
+.receipt-barcode { display: flex; justify-content: center; gap: 2px; height: 56px; margin: 2rem 0 0.8rem; }
+.receipt-barcode i { display: block; background: currentColor; }
+.receipt-tape__thanks { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.22em; text-align: center; text-transform: uppercase; }
+.receipt-footer {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  align-items: end;
+  gap: 2rem;
+  padding: clamp(3rem, 6vw, 5.5rem) clamp(1rem, 4vw, 4rem);
+}
+.receipt-footer p { margin: 0; font-size: clamp(2.4rem, 6vw, 6.5rem); font-weight: 900; letter-spacing: -0.08em; line-height: 0.88; text-transform: uppercase; }
+.receipt-footer > div { display: flex; flex-direction: column; align-items: flex-end; gap: 1.2rem; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.receipt-footer a { border-bottom: 1px solid currentColor; padding-bottom: 0.4rem; text-decoration: none; }
+/* Pin the intro beside the tape only when the viewport is tall enough to hold it. */
+@media (min-width: 761px) and (min-height: 700px) {
+  .receipt-intro { position: sticky; top: 60px; align-self: start; min-height: calc(100svh - 60px); }
+}
+
+/* ---- Lifestyle — "After hours". Not a storefront: an evening told in three
+   timestamps, each photo paired with the one object made for that hour.
+   Photos run a cobalt duotone (lighten blend) so the lifestyle frames sit in
+   the same ink as the shop, while product shots stay true to color. ---- */
+.shop-lifestyle { background: var(--shop-paper); }
+.life-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-areas: "kicker kicker" "title lede" "timeline timeline";
+  align-items: end;
+  column-gap: 4vw;
+  border-bottom: 2px solid var(--shop-ink);
+  padding: clamp(2.5rem, 6vw, 5rem) clamp(1rem, 4vw, 4rem) 0;
+}
+.life-hero > .shop-kicker { grid-area: kicker; }
+.life-hero h1 { grid-area: title; margin: 1.5rem 0 3.5rem; font-size: clamp(5rem, 13vw, 14rem); text-transform: uppercase; }
+.life-hero__lede { grid-area: lede; max-width: 42ch; margin-bottom: 3.8rem; font-size: 0.8rem; line-height: 1.75; }
+.life-timeline { grid-area: timeline; position: relative; margin: 0 calc(clamp(1rem, 4vw, 4rem) * -1); border-top: 2px solid var(--shop-ink); padding: 0 clamp(1rem, 4vw, 4rem); }
+.life-timeline__axis, .life-timeline ol { position: relative; }
+.life-timeline__axis { height: 2.6rem; }
+.life-timeline__axis span {
+  position: absolute;
+  left: var(--at);
+  top: 0;
+  border-left: 1px solid var(--shop-ink);
+  padding: 0.7rem 0 0 0.4rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+}
+.life-timeline__axis span:last-child { border-left: 0; border-right: 1px solid var(--shop-ink); padding: 0.7rem 0.4rem 0 0; transform: translateX(-100%); }
+.life-timeline ol { height: 6.5rem; margin: 0; padding: 0; list-style: none; }
+.life-timeline li { position: absolute; left: var(--at); top: 0; transform: translateX(-6px); }
+.life-timeline a { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: baseline; gap: 0.2rem 0.6rem; padding: 0.4rem 0.6rem 0.6rem 0; text-decoration: none; }
+.life-timeline a i { grid-row: 1 / 3; align-self: start; width: 12px; height: 12px; margin-top: 0.2rem; background: var(--shop-ink); }
+.life-timeline a strong { font-size: clamp(1.2rem, 2.2vw, 2rem); font-weight: 900; letter-spacing: -0.06em; }
+.life-timeline a span { grid-column: 2; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.life-timeline a:hover strong, .life-timeline a:focus-visible strong { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 0.18em; }
+
+.life-chapter {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  grid-template-areas: "time time" "photo copy";
+  column-gap: clamp(2rem, 5vw, 6rem);
+  border-bottom: 2px solid var(--shop-ink);
+  padding: clamp(3rem, 6vw, 6rem) clamp(1rem, 4vw, 4rem);
+  scroll-margin-top: 60px;
+}
+.life-chapter--flip { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); grid-template-areas: "time time" "copy photo"; }
+.life-chapter__time { grid-area: time; display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: clamp(1.5rem, 3vw, 3rem); border-bottom: 1px solid var(--shop-ink); }
+.life-chapter--flip .life-chapter__time { flex-direction: row-reverse; }
+.life-chapter__time span { padding-bottom: 1rem; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; }
+.life-chapter__time p { margin: 0 0 -0.12em; font-size: clamp(5rem, 15vw, 16rem); font-weight: 900; letter-spacing: -0.09em; line-height: 0.8; text-transform: uppercase; }
+.life-chapter__photo { grid-area: photo; margin: 0; }
+.life-chapter__frame { position: relative; aspect-ratio: 4 / 5; overflow: hidden; border: 2px solid var(--shop-ink); background: var(--shop-ink); }
+.life-chapter__frame::after { content: ""; position: absolute; inset: 0; background: var(--shop-ink); mix-blend-mode: lighten; pointer-events: none; }
+.life-chapter__photo figcaption { display: flex; justify-content: space-between; gap: 1rem; border: 2px solid var(--shop-ink); border-top: 0; padding: 0.65rem; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.life-chapter__copy { grid-area: copy; display: flex; flex-direction: column; align-self: end; }
+.life-chapter__copy h2 { font-size: clamp(3rem, 6vw, 6.5rem); text-transform: uppercase; }
+.life-chapter__copy > p { max-width: 40ch; margin: 1.8rem 0 2.5rem; font-size: 0.8rem; line-height: 1.75; }
+.life-kit { border: 2px solid var(--shop-ink); padding: 1.1rem; }
+.life-kit__row { display: grid; grid-template-columns: 96px 1fr; gap: 1rem; align-items: center; margin-top: 0.9rem; }
+.life-kit__image { position: relative; aspect-ratio: 1; border: 1px solid var(--shop-ink); background: var(--shop-paper); }
+.life-kit h3 { font-size: 1.1rem; letter-spacing: -0.03em; line-height: 1; text-transform: uppercase; }
+.life-kit__row p { margin-top: 0.5rem; font-size: 0.66rem; line-height: 1.5; }
+.life-coda {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2rem;
+  background: var(--shop-ink);
+  color: var(--shop-paper);
+  padding: clamp(4rem, 9vw, 9rem) clamp(1rem, 4vw, 4rem);
+}
+.life-coda h2 { font-size: clamp(3.4rem, 9vw, 9.5rem); text-transform: uppercase; }
+.life-coda .shop-text-link { color: var(--shop-paper); text-decoration: none; }
+.life-footer { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--shop-paper); background: var(--shop-ink); color: var(--shop-paper); padding: 1.3rem clamp(1rem, 4vw, 4rem); font-size: 0.62rem; text-transform: uppercase; }
+
 /* ---- Order confirmation — shared across every direction, no chooser context ---- */
 .shop-success { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; min-height: 100vh; padding: 4rem 1.5rem; text-align: center; }
 .shop-success h1 { margin: 0; font-size: clamp(3rem, 9vw, 6rem); font-weight: 900; text-transform: uppercase; }
@@ -846,7 +1067,6 @@
 @media (max-width: 760px) {
   .shop-nav { display: block; }
   .shop-nav__home { min-height: 48px; border-right: 0; border-bottom: 1px solid var(--shop-ink); }
-  .shop-nav ol { overflow-x: auto; }
   .shop-nav li { flex: 1 0 auto; }
   .shop-nav li:first-child { border-left: 0; }
 
@@ -927,8 +1147,39 @@
   .kiosk-listing { grid-template-columns: 1fr; }
   .kiosk-listing__index { display: none; }
   .kiosk-footer { flex-direction: column; gap: 0.5rem; }
+
+  .shop-nav__links ol { flex: 1; min-width: 0; }
+
+  .receipt-layout { grid-template-columns: 1fr; }
+  .receipt-intro { gap: 2.5rem; border-bottom: 2px solid var(--shop-ink); padding: 3rem 1rem 2.5rem; }
+  .receipt-intro h1 { font-size: clamp(3.4rem, 17vw, 6rem); }
+  .receipt-counter { padding: 2.5rem 1rem 4rem; }
+  .receipt-tape { transform: none; padding-inline: 1.1rem; }
+  .receipt-footer { grid-template-columns: 1fr; gap: 2.5rem; }
+  .receipt-footer > div { align-items: flex-start; }
+
+  .life-hero { display: block; padding-top: 3rem; }
+  .life-hero h1 { margin: 1.2rem 0 2rem; font-size: clamp(4.4rem, 24vw, 8rem); }
+  .life-hero__lede { margin-bottom: 2.5rem; }
+  .life-timeline__axis { display: none; }
+  .life-timeline ol { display: grid; height: auto; padding: 0.4rem 0; }
+  .life-timeline li { position: static; transform: none; border-bottom: 1px solid var(--shop-ink); }
+  .life-timeline li:last-child { border-bottom: 0; }
+  .life-timeline a { padding: 0.8rem 0; }
+  .life-chapter, .life-chapter--flip { grid-template-columns: 1fr; grid-template-areas: "time" "photo" "copy"; padding: 3rem 1rem; }
+  .life-chapter--flip .life-chapter__time { flex-direction: row; }
+  .life-chapter__time { gap: 1rem; }
+  .life-chapter__time p { font-size: clamp(3.6rem, 19vw, 8rem); }
+  .life-chapter__copy { margin-top: 2.5rem; }
+  .life-chapter__copy h2 { font-size: clamp(3rem, 15vw, 5rem); }
+  .life-kit__row { grid-template-columns: 76px 1fr; }
+  .life-coda { display: block; padding: 4.5rem 1rem; }
+  .life-coda h2 { margin-bottom: 2.5rem; }
+  .life-footer { flex-direction: column; gap: 0.5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .shop-design *, .shop-design *::before, .shop-design *::after { animation: none !important; transition: none !important; }
 }
+
+/* Shared, on-demand product preview across all storefronts. */
