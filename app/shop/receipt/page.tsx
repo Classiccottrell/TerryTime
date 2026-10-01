@@ -15,7 +15,7 @@ const shelfTotalCents = products.reduce((sum, product) => sum + startingPriceCen
 
 function sizeSummary(product: Product) {
   const { variants } = product;
-  return variants.length === 1 ? variants[0].label : `${variants[0].label}–${variants[variants.length - 1].label}`;
+  return variants.length === 1 ? "" : ` / ${variants[0].label}–${variants[variants.length - 1].label}`;
 }
 
 // Deterministic barcode: bar widths come from the store code's char codes,
@@ -85,7 +85,7 @@ export default function ReceiptShopPage() {
                       />
                     </div>
                     <p className="receipt-item__meta">
-                      {variant.color} / {sizeSummary(product)} / Design: {product.voice}
+                      {variant.color}{sizeSummary(product)} / Design: {product.voice}
                     </p>
                     <p className="receipt-item__blurb">{product.blurb}</p>
                     <ProductPurchase product={product} />

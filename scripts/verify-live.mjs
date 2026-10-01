@@ -33,6 +33,17 @@ const record = (status, name, detail = "") => {
 };
 
 const { products } = await import("../lib/products.ts");
+const { quoteShipping } = await import("../lib/shipping.ts");
+const DESTINATIONS = [
+  { name: "Vancouver, BC", destination: { country: "CA", state: "BC", postalCode: "V5N 4B6" },
+    recipient: { name: "Terry Test", address1: "2300 Commercial Dr", city: "Vancouver", state_code: "BC", country_code: "CA", zip: "V5N 4B6" } },
+  { name: "St. John's, NL", destination: { country: "CA", state: "NL", postalCode: "A1C 5S7" },
+    recipient: { name: "Terry Test", address1: "1 Water St", city: "St. John's", state_code: "NL", country_code: "CA", zip: "A1C 5S7" } },
+  { name: "New York, NY", destination: { country: "US", state: "NY", postalCode: "10001" },
+    recipient: { name: "Terry Test", address1: "350 5th Ave", city: "New York", state_code: "NY", country_code: "US", zip: "10001" } },
+  { name: "Los Angeles, CA", destination: { country: "US", state: "CA", postalCode: "90012" },
+    recipient: { name: "Terry Test", address1: "200 N Spring St", city: "Los Angeles", state_code: "CA", country_code: "US", zip: "90012" } },
+];
 const money = (n) => `$${Number(n).toFixed(2)}`;
 
 async function pf(path, init = {}) {
@@ -96,18 +107,23 @@ async function printful() {
         record(cv.in_stock === false ? "WARN" : "PASS", `${label}: stock`, cv.in_stock === false ? "OUT OF STOCK" : cv.name);
       }
 
-      const est = await pf(`/orders/estimate-costs`, {
-        method: "POST",
-        body: JSON.stringify({ recipient, items: [{ sync_variant_id: sv.id, quantity: 1 }] }),
-      });
-      if (!est.ok) { record("FAIL", `${label}: cost estimate`, `${est.status} ${est.body?.error?.message ?? ""}`); continue; }
-      const c = est.body.result.costs;
-      const retail = v.priceCents / 100;
-      const flatShip = (Number(process.env.SHIPPING_FLAT_CENTS) || 1295) / 100;
-      const fees = (retail + flatShip) * 0.029 + 0.3;
-      const margin = retail + flatShip - Number(c.total) - fees;
-      record(margin > 0 ? "PASS" : "FAIL", `${label}: margin (CA, after ~Stripe fees)`,
-        `retail ${money(retail)} + ship ${money(flatShip)} - Printful ${money(c.total)} - fees ${money(fees)} = ${money(margin)}`);
+      // Margin to a representative address in each country (what the buyer would be charged vs. what Printful bills).
+      for (const dest of DESTINATIONS) {
+        const est = await pf(`/orders/estimate-costs`, {
+          method: "POST",
+          body: JSON.stringify({ recipient: dest.recipient, items: [{ sync_variant_id: sv.id, quantity: 1 }], currency: "CAD" }),
+        });
+        if (!est.ok) { record("FAIL", `${label}: cost estimate → ${dest.name}`, `${est.status} ${est.body?.error?.message ?? ""}`); continue; }
+        const c = est.body.result.costs;
+        const q = await quoteShipping({ printfulVariantId: v.printfulVariantId, quantity: 1, destination: dest.destination });
+        const retail = v.priceCents / 100;
+        const charged = retail + q.amountCents / 100;
+        const fees = charged * 0.029 + 0.3;
+        const margin = charged - Number(c.total) - fees;
+        record(margin > 0 ? "PASS" : "FAIL", `${label} → ${dest.name}: margin`,
+          `charged ${money(charged)} (ship ${money(q.amountCents / 100)}, ${q.source}) - Printful ${money(c.total)} - fees ${money(fees)} = ${money(margin)}`);
+        if (q.source === "fallback") record("WARN", `${label} → ${dest.name}: live shipping rate`, "using the flat fallback; Printful /shipping/rates didn't answer");
+      }
     }
   }
 
@@ -198,7 +214,10 @@ async function site(base) {
     "A/B split on /shop", `→ ${loc || ab?.status}`);
   const co = await fetch(root + "/api/checkout", {
     method: "POST", headers: { "Content-Type": "application/json", Referer: `${root}/shop/receipt` },
-    body: JSON.stringify({ productId: products.flatMap((p) => p.variants).find((x) => x.printfulSyncVariantId)?.id ?? products[0].variants[0].id }),
+    body: JSON.stringify({
+      productId: products.flatMap((p) => p.variants).find((x) => x.printfulSyncVariantId)?.id ?? products[0].variants[0].id,
+      destination: { country: "CA", state: "BC", postalCode: "V5N 4B6" },
+    }),
   }).catch(() => null);
   const data = await co?.json().catch(() => null);
   record(co?.ok && data?.url?.startsWith("https://checkout.stripe.com") ? "PASS" : "FAIL", "POST /api/checkout returns a Stripe URL", String(co?.status));

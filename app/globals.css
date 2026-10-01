@@ -295,6 +295,20 @@
 .shop-design .shop-sizes legend { margin-bottom: 0.4rem; padding: 0; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
 .shop-design .shop-sizes .shop-variants { flex-wrap: wrap; margin-bottom: 0; }
 .shop-design .shop-variants button { min-width: 2.8rem; }
+.shop-design .shop-shipto { margin: 0 0 0.7rem; font-size: 0.68rem; }
+.shop-design .shop-shipto__legend { margin: 0 0 0.4rem; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.shop-design .shop-shipto__row { display: grid; grid-template-columns: 1fr 1fr 0.8fr; gap: 0.4rem; margin-bottom: 0.5rem; }
+.shop-design .shop-shipto label { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.shop-design .shop-shipto label span { font-size: 0.55rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.shop-design .shop-shipto select, .shop-design .shop-shipto input { width: 100%; min-width: 0; border: 1px solid var(--shop-ink); border-radius: 0; background: transparent; padding: 0.45rem 0.4rem; color: var(--shop-ink); font: inherit; font-size: 0.72rem; }
+.shop-design .shop-shipto select:focus-visible, .shop-design .shop-shipto input:focus-visible { outline: 2px solid var(--shop-ink); outline-offset: 1px; }
+.shop-design .shop-shipto > button[type="submit"], .shop-design .shop-shipto--set button { width: auto; border: 1px solid var(--shop-ink); background: transparent; padding: 0.4rem 0.7rem !important; color: var(--shop-ink); font: inherit; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
+.shop-design .shop-shipto > button[type="submit"]:hover, .shop-design .shop-shipto--set button:hover { background: var(--shop-ink); color: var(--shop-paper); }
+.shop-design .shop-shipto--set { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.7rem; }
+.shop-design .shop-shipto--set span { font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.shop-design .shop-shipto__error { margin: 0 0 0.5rem; font-weight: 800; text-decoration: underline wavy; text-underline-offset: 3px; }
+.shop-design .shop-shipto__quote { display: flex; flex-direction: column; gap: 0.15rem; margin: 0 0 0.6rem; font-size: 0.68rem; line-height: 1.5; }
+@media (max-width: 520px) { .shop-design .shop-shipto__row { grid-template-columns: 1fr 1fr; } .shop-design .shop-shipto__row label:last-child { grid-column: 1 / -1; } }
 .shop-design .checkout-canceled { margin: 0; border-color: var(--shop-ink); background: var(--shop-paper); color: var(--shop-ink); }
 .shop-design .checkout-canceled .text-red { color: var(--shop-ink); }
 

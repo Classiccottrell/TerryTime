@@ -9,18 +9,20 @@ Companion docs: `launch-roadmap.md` (timeline and marketing), `copy-deck.md` (te
 
 - [ ] **Merge PR #11** into main (A/B stores, sizes, favicon, tooling). — You
 - [ ] **Deploy to a server host, not GitHub Pages.** Vercel already builds previews; point the production domain at it. Checkout, the webhook and the A/B middleware need a server. — You
-- [ ] **Add env vars on the host:** `PRINTFUL_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_SITE_URL`, `SHIPPING_FLAT_CENTS`, `RESEND_API_KEY` + `RESEND_AUDIENCE_ID`. Start with **Stripe test keys**. — You
-- [ ] **Create every size in the Printful store.** The Terry Store needs Polo S–2XL, Hoodie S–2XL and Dad Hat (one size) as sync products with the Terry face artwork on each. Product names must contain "Pique Polo", "Hoodie" and "Dad Hat". — You
-- [ ] **Run `npm run sync:printful`**, commit the generated `lib/printful-map.mjs`. Until then every size is unsellable (checkout refuses with "That size isn't available"). Any ✗ it prints is a naming or size mismatch to fix in Printful. — Claude + You
+- [ ] **Add env vars on the host:** `PRINTFUL_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_SITE_URL=https://terryterrylarryberry.com` (Production scope only, so preview deploys don't redirect Stripe to the live domain), `RESEND_API_KEY` + `RESEND_AUDIENCE_ID`. Start with **Stripe test keys**. — You
+- [ ] **Create every size in the Printful store.** The Terry Store needs Polo S–XL, Hoodie S–XL and Dad Hat (one size) as sync products with the Terry face artwork on each. Product names must contain "Pique Polo", "Hoodie" and "Dad Hat". — You
+- [ ] **Run `npm run sync:printful`**, commit the generated `lib/printful-map.mjs`. Until then every size is unsellable (checkout refuses with "That size isn't available"). It also checks Printful's own blank is made in each size (and in stock). Any ✗ is a naming problem in your store or a size the blank doesn't come in, which means that size has to be dropped from `SIZES_APPAREL` in `lib/products.ts`. — Claude + You
 - [ ] **Run `npm run verify:live`** and get zero FAIL. It checks auth, every size is linked, stock, per-size margin, a test Checkout Session, and the webhook. — Claude + You
 - [ ] **Register the Stripe webhook** at `https://<domain>/api/webhook` for `checkout.session.completed`, put the signing secret in `STRIPE_WEBHOOK_SECRET`. — You
 
 ## B. Money: get these right before real customers
 
-- [ ] **Shipping price.** Default is a flat $12.95 CAD for everyone. Compare against real Printful rates for CA and US (they differ) and for hoodies vs hats; consider per-country rates or free shipping over a threshold. — You decide, Claude builds
-- [ ] **Margins per size.** `verify:live` prints margin after Stripe fees for each size. 2XL costs more at Printful on most garments; add a size upcharge if any size is thin (the model supports per-variant `priceCents`). — You decide, Claude builds
+- [x] **Shipping is location-based (built).** The buyer enters country, province/state and postal code on the product; the server asks Printful's `/shipping/rates` for that exact order and address and charges it (Stripe is then locked to that country). Falls back to flat $11.95 CA / $15.95 US only if Printful's rates API is down. Still to do: **confirm it against the real API** (`verify:live` shows charged vs. Printful cost to Vancouver, St. John's, New York and Los Angeles). — You + Claude
+- [ ] **Decide shipping policy on top of the live rate:** pass through at cost (current), add a buffer (`SHIPPING_BUFFER_CENTS`), or free shipping over a threshold. — You decide, Claude builds
+- [ ] **Check the quote vs. address risk.** The quote uses the province/postal code typed before checkout; the final address is entered in Stripe and could differ (rarely by much). Decide whether to accept that or re-check in the webhook and flag mismatches. — You decide
+- [ ] **Margins per size.** `verify:live` prints margin after Stripe fees for each size. XL can cost more at Printful on some garments; add a size upcharge if any size is thin (the model supports per-variant `priceCents`). — You decide, Claude builds
 - [ ] **Taxes.** Turn on Stripe Tax (GST/HST/PST for Canada; US sales tax if you ship there). Decide whether prices are tax-inclusive. Check whether you must register for GST/HST (the $30k small-supplier threshold). — You
-- [ ] **US shipping and duties.** Decide whether to keep selling to the US (Printful can bill duties; US buyers may owe import fees). Otherwise restrict to Canada. — You
+- [ ] **US duties and taxes.** US shipping is on. Confirm with Printful how duties/taxes are handled for CA→US and US→CA orders (Printful ships from facilities in both countries) and whether you must collect state sales tax (economic nexus thresholds). — You
 - [ ] **Stripe account:** business details, payout bank account, statement descriptor ("TERRY TIME"), receipt emails with your branding, live-mode keys. — You
 - [ ] **Printful account:** payment method on file (it bills you when an order is confirmed), packing slip branding (your logo, return address), "Terry Time" as the store name. — You
 
@@ -54,7 +56,7 @@ Companion docs: `launch-roadmap.md` (timeline and marketing), `copy-deck.md` (te
 
 - [ ] **Cookie-free analytics** (Plausible or Vercel Analytics) with per-store events: store viewed, size selected, checkout started, purchase. The A/B test needs this to mean anything. — Claude, with your account
 - [ ] Sitemap, robots, canonical URLs, `Product` JSON-LD on product pages. — Claude
-- [ ] Domain: pick the production domain (the code assumes terryterrylarryberry.com in `metadataBase`), set DNS and HTTPS. — You
+- [ ] **Domain: terryterrylarryberry.com (root).** Add it to the Vercel project, set DNS (A record to Vercel, plus `www` redirecting to the root), confirm HTTPS, set `NEXT_PUBLIC_SITE_URL` in Production. `metadataBase`, robots.txt and sitemap.xml already point at it. — You
 - [ ] Accessibility pass: contrast of the small blue mono text, focus rings, size picker with a screen reader. — Claude
 - [ ] Mobile pass on real phones (the size picker and receipt layout especially). — You + Claude
 - [ ] Rate limiting / bot protection on `/api/checkout` and `/api/subscribe` (Vercel firewall or a simple limiter) so nobody can spam Stripe sessions. — Claude
@@ -67,10 +69,14 @@ Companion docs: `launch-roadmap.md` (timeline and marketing), `copy-deck.md` (te
 - [ ] Watch Printful drafts and Stripe payments twice a day for the first week. — You
 - [ ] After enough traffic (about 300+ visitors per store and the promo over), read the A/B result and pick a winner. Then I'll make the winner the default and remove the split. — You + Claude
 
-## Decisions I need from you
+## Decisions (answered Oct 1)
 
-1. Ship to the US as well as Canada? (affects shipping, duties and taxes)
-2. Flat shipping or per-country rates? What number?
-3. Sizes: stop at 2XL, or add 3XL+ (Printful offers more on the hoodie)?
-4. Launch discount, or none (recommended: none, free-shipping threshold instead)?
-5. Which domain is production?
+- Ship to **Canada and the US**, shipping priced per location.
+- Sizes: **S–XL** (no 2XL+). Hat is one size with no picker.
+- Production domain: **terryterrylarryberry.com** (root).
+
+## Still open
+
+1. Shipping on top of Printful's rate: at cost, with a buffer, or free over a threshold?
+2. Launch discount, or none (recommended: none)?
+3. Sales tax approach (Stripe Tax on or off, GST/HST registration status).

@@ -22,7 +22,7 @@ Cyber Monday Nov 30. Confirm Printful's holiday shipping cutoffs in the dashboar
 | Add `PRINTFUL_API_KEY`, `STRIPE_SECRET_KEY` (test), `STRIPE_WEBHOOK_SECRET` to the host | You | `npm run verify:live` has no FAIL |
 | Run `npm run verify:live -- --discover`, paste `printfulSyncVariantId` into `lib/products.ts` | Claude + you | Orders created from sync variants |
 | Check margin output (retail + shipping vs Printful cost) | You | Every SKU margin > 0 after Stripe fees (2.9% + 30¢) |
-| Set `SHIPPING_FLAT_CENTS` from real Printful rates (CA and US differ) | You | Shipping covers cost |
+| Run `verify:live` and review the live shipping charged vs. Printful cost per region | You | Shipping covers cost |
 | Order one of each sample, shot-list ready | You | Samples in hand |
 | Final copy pass (`docs/copy-deck.md`) | You | Edited deck returned |
 | Buy domain/DNS, deploy to Vercel/Netlify (static GH Pages can't run checkout) | You | Site live on the real domain |
@@ -135,7 +135,7 @@ Target keywords (low competition, local): "East Vancouver art apparel", "Vancouv
 | Risk | Mitigation |
 | --- | --- |
 | Orders fail to reach Printful (webhook down) | Webhook logs loudly; add Stripe failed-delivery alerts and check Printful drafts daily. Add retry/queue if volume grows. |
-| Shipping underpriced → loses money | Real rate review, `SHIPPING_FLAT_CENTS`, margin shown by `verify:live`. |
+| Shipping underpriced → loses money | Shipping is quoted per destination from Printful's live rates; margin per size and region shown by `verify:live`. |
 | Wrong item/size shipped | Size picker added (nothing preselected). Every size must be linked to a Printful sync variant via `npm run sync:printful`; unlinked sizes are refused at checkout. |
 | Tax / duties | Canadian GST/HST/PST, US sales tax, customs. Turn on Stripe Tax and decide on DDP with Printful. |
 | Copy that says "on the way" before it's printed | Fix per `copy-deck.md` §5. |

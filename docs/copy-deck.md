@@ -25,7 +25,14 @@ Receipt** (`/shop/receipt`). Visitors are split 50/50 and never see the other st
 | Error: Stripe failure | Couldn't start checkout. Try again in a moment. | |
 | Error: network | Network error. Try again. | |
 | Canceled banner | **Checkout canceled.** No charge — take your time. | |
-| Shipping option label | Standard (Printful, 5–10 business days) | |
+| Shipping option label (Stripe) | Standard shipping · est. {n–m} business days | |
+| Size picker label | Size · S / M / L / XL (hat: none) | |
+| Ship-to heading | Where is it going? | |
+| Ship-to fields | Country · Province/State · Postal code/ZIP code · "Get shipping" · "Change" | |
+| Ship-to errors | Pick Canada or the United States. · Pick a province/state. · Enter a valid postal code, like V5N 4B6. · Enter a valid ZIP code, like 10001. | |
+| Shipping quote line | Shipping {$} · est. {n–m} business days · Total {$} CAD | |
+| Buy button states | Select a size → Add shipping location → Pricing shipping… → Buy — {total} | |
+| Size not linked | That size isn't available right now. Try another or check back soon. | |
 
 > The meta description still says "sticker and merch"; the catalog is apparel only now.
 > Suggested: "Embroidered East Van apparel. Polo, hoodie and dad hat. Printed to order."

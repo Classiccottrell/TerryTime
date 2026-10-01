@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getStripe, CURRENCY } from "@/lib/stripe";
 import { getVariant, isFulfillable } from "@/lib/products";
 import { routeForPath } from "@/lib/shop-routes.mjs";
+import { parseDestination, type Destination } from "@/lib/regions";
+import { quoteShipping } from "@/lib/shipping";
 
 export const runtime = "nodejs";
 
@@ -27,11 +29,6 @@ function storeFromReferer(req: Request) {
   }
 }
 
-function shippingCents(): number {
-  const cents = Number(process.env.SHIPPING_FLAT_CENTS);
-  return Number.isInteger(cents) && cents >= 0 ? cents : 1295;
-}
-
 export async function POST(req: Request) {
   const stripe = getStripe();
   if (!stripe) {
@@ -45,10 +42,12 @@ export async function POST(req: Request) {
   }
 
   let productId: string | undefined;
+  let destinationInput: unknown;
   let quantity = 1;
   try {
     const body = await req.json();
     productId = body?.productId;
+    destinationInput = body?.destination;
     if (Number.isInteger(body?.quantity) && body.quantity > 0) {
       quantity = Math.min(body.quantity, 20);
     }
@@ -68,6 +67,12 @@ export async function POST(req: Request) {
     );
   }
 
+  const dest = parseDestination(destinationInput);
+  if (!dest.ok) {
+    return NextResponse.json({ error: dest.error }, { status: 400 });
+  }
+  const destination: Destination = dest.destination;
+
   // Fail closed: a variant with no Printful sync id would take payment and then
   // be unfulfillable. ALLOW_UNMAPPED_VARIANTS=true is for Stripe test mode only.
   if (!isFulfillable(variant) && process.env.ALLOW_UNMAPPED_VARIANTS !== "true") {
@@ -80,6 +85,12 @@ export async function POST(req: Request) {
 
   const origin = siteOrigin(req);
   const store = storeFromReferer(req);
+  // Priced server-side from Printful's rate to this address; the client's number is never used.
+  const shipping = await quoteShipping({
+    printfulVariantId: variant.printfulVariantId,
+    quantity,
+    destination,
+  });
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -98,16 +109,14 @@ export async function POST(req: Request) {
           },
         },
       ],
-      // Stickers ship — collect an address.
-      shipping_address_collection: { allowed_countries: ["CA", "US"] },
-      // Printful bills shipping per order, so charge it here or it comes out of margin.
-      // Flat rates (cents) are placeholders until real Printful rates are reviewed.
+      // Locked to the country they chose (and were quoted for); Stripe collects the full address.
+      shipping_address_collection: { allowed_countries: [destination.country] },
       shipping_options: [
         {
           shipping_rate_data: {
             type: "fixed_amount",
-            display_name: "Standard (Printful, 5–10 business days)",
-            fixed_amount: { amount: shippingCents(), currency: CURRENCY },
+            display_name: `Standard shipping · est. ${shipping.estimate} business days`,
+            fixed_amount: { amount: shipping.amountCents, currency: CURRENCY },
           },
         },
       ],
@@ -118,6 +127,9 @@ export async function POST(req: Request) {
         quantity: String(quantity),
         store: store?.shortLabel.toLowerCase() ?? "other",
         ab_variant: store?.variant ?? "none",
+        ship_to: `${destination.country}-${destination.state}`,
+        shipping_cents: String(shipping.amountCents),
+        shipping_source: shipping.source,
       },
       success_url: `${origin}/shop/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}${store?.href ?? "/shop"}?canceled=1`,

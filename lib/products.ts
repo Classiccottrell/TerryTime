@@ -33,7 +33,7 @@ export type Product = {
   variants: Variant[];
 };
 
-const SIZES_APPAREL = ["S", "M", "L", "XL", "2XL"];
+const SIZES_APPAREL = ["S", "M", "L", "XL"];
 const ONE_SIZE = ["One size"];
 
 export function formatPrice(cents: number): string {

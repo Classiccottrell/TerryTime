@@ -9,8 +9,10 @@
  *
  * Matching: a store product matches a local product when every word of the
  * local name (ignoring "unisex") appears in the store product's name; a sync
- * variant then matches a local size by its `size` field (S, M … 2XL; "One
+ * variant then matches a local size by its `size` field (S, M, L, XL; "One
  * size" accepts "OS" / "One size") and the colour by its `color` field.
+ * It also confirms Printful's own blank is offered (and in stock) in each size,
+ * so a size we list but the blank doesn't make is caught here.
  * Anything ambiguous or unmatched is reported and left out — it stays
  * unsellable rather than guessed.
  */
@@ -52,6 +54,17 @@ const { products } = await import("../lib/products.ts");
 const storeProducts = await pf("/store/products?limit=100");
 const map = {};
 let problems = 0;
+const catalogCache = new Map();
+
+/** Sizes Printful actually offers for this blank in this colour (catalog, not our store). */
+async function catalogSizes(catalogVariantId, color) {
+  const variant = await pf(`/products/variant/${catalogVariantId}`);
+  const productId = variant.product.product_id;
+  if (!catalogCache.has(productId)) catalogCache.set(productId, await pf(`/products/${productId}`));
+  const catalog = catalogCache.get(productId);
+  const rows = catalog.variants.filter((v) => norm(v.color) === norm(color));
+  return { name: catalog.product.title, rows };
+}
 
 for (const product of products) {
   const need = words(product.name);
@@ -76,6 +89,15 @@ for (const product of products) {
       console.error(`  ✗ ${v.id}: ${hits.length === 0 ? "no sync variant for this size/colour" : "more than one sync variant matches"}`);
       continue;
     }
+    // The blank itself must come in this size and be in stock, not just our store listing.
+    const { name, rows } = await catalogSizes(hits[0].variant_id, v.color);
+    const row = rows.find((r) => sizeKey(r.size) === sizeKey(v.size));
+    if (!row) {
+      problems++;
+      console.error(`  ✗ ${v.id}: Printful's "${name}" in ${v.color} isn't offered in ${v.size}. It offers: ${rows.map((r) => r.size).join(", ") || "(none)"}`);
+      continue;
+    }
+    if (row.in_stock === false) console.warn(`  ! ${v.id}: ${name} ${v.size} is OUT OF STOCK at Printful right now`);
     map[v.id] = { sync: hits[0].id, catalog: hits[0].variant_id };
     console.log(`  ✓ ${v.id} → sync ${hits[0].id} / catalog ${hits[0].variant_id}`);
   }

@@ -1,10 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import type { Product, Variant } from "@/lib/products";
+import { formatPrice, type Product, type Variant } from "@/lib/products";
+import type { Destination } from "@/lib/regions";
 import { asset, isStaticExport } from "@/lib/site";
 
-export function BuyButton({ product, variant }: { product: Product; variant: Variant | null }) {
+export type ShippingQuote = { amountCents: number; estimate: string; totalCents: number };
+
+export function BuyButton({
+  product,
+  variant,
+  destination,
+  quote,
+}: {
+  product: Product;
+  variant: Variant | null;
+  destination: Destination | null;
+  quote: ShippingQuote | null;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,13 +26,17 @@ export function BuyButton({ product, variant }: { product: Product; variant: Var
       setError("Pick a size first.");
       return;
     }
+    if (!destination) {
+      setError("Tell us where it's shipping first.");
+      return;
+    }
     setError(null);
     setLoading(true);
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: variant.id }),
+        body: JSON.stringify({ productId: variant.id, destination }),
       });
       const data = await res.json();
       if (!res.ok || !data.url) {
@@ -50,11 +67,11 @@ export function BuyButton({ product, variant }: { product: Product; variant: Var
     <div className="mt-5">
       <button
         onClick={onBuy}
-        disabled={loading || isStaticExport || !variant}
+        disabled={loading || isStaticExport || !variant || !destination || !quote}
         title={isStaticExport ? "Checkout runs on the live site" : undefined}
         className="w-full border border-ink bg-ink px-6 py-3 font-[family-name:var(--font-grotesk)] text-sm font-bold uppercase tracking-widest text-paper transition-colors hover:bg-red hover:border-red disabled:opacity-60"
       >
-        {loading ? "Starting…" : variant ? `Buy — ${variant.price}` : "Select a size"}
+        {loading ? "Starting…" : !variant ? "Select a size" : !destination ? "Add shipping location" : !quote ? "Pricing shipping…" : `Buy — ${formatPrice(quote.totalCents)}`}
       </button>
       {isStaticExport ? (
         <p className="mt-2 font-[family-name:var(--font-spacemono)] text-xs text-stone">

@@ -79,7 +79,9 @@ export default function ArchiveShopPage() {
                   <div><dt>Condition</dt><dd>Ready for circulation</dd></div>
                   <div><dt>Marking</dt><dd>Embroidered Terry face</dd></div>
                   <div><dt>Finish</dt><dd>{product.variants[0].color}</dd></div>
-                  <div><dt>Sizes</dt><dd>{product.variants.map((v) => v.label).join(" / ")}</dd></div>
+                  {product.variants.length > 1 && (
+                    <div><dt>Sizes</dt><dd>{product.variants.map((v) => v.label).join(" / ")}</dd></div>
+                  )}
                   <div><dt>Value</dt><dd>{formatPrice(startingPriceCents(product))} CAD</dd></div>
                 </dl>
                 <p>{product.blurb}</p>

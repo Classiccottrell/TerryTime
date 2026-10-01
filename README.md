@@ -60,6 +60,8 @@ Copy `.env.example` → `.env.local` and fill in what you want to enable.
 Then `npm run verify:live` (add `-- --discover`, `-- --draft-order`, `-- --site <url>`)
 smoke-tests Printful and Stripe: auth, variants, margins, test checkout, webhook.
 
+Shipping (CA + US): the buyer enters country / province-state / postal code; the server prices it from Printful's live `/shipping/rates` for that address (flat fallback per country if Printful is down) and Stripe is locked to that country. Sizes are S–XL for the polo and hoodie; the hat is one size.
+
 Sizes: each size is its own variant, linked to Printful by `npm run sync:printful`
 (writes `lib/printful-map.mjs`); unlinked sizes can't be bought.
 
