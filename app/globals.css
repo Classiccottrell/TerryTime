@@ -1181,3 +1181,5 @@
 @media (prefers-reduced-motion: reduce) {
   .shop-design *, .shop-design *::before, .shop-design *::after { animation: none !important; transition: none !important; }
 }
+
+/* Shared, on-demand product preview across all storefronts. */
