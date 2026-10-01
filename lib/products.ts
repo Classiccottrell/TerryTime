@@ -6,7 +6,14 @@ export type Variant = {
   price: string;
   priceCents: number;
   image: string;
+  /** Printful catalog variant id (price/stock lookups, cost estimates). */
   printfulVariantId: number;
+  /**
+   * Printful store *sync* variant id. Orders for a design-bearing product must
+   * reference this (it carries the artwork files); a bare catalog variant id
+   * is rejected for lack of print files. Fill from `npm run verify:live -- --discover`.
+   */
+  printfulSyncVariantId?: number;
 };
 
 export type Product = {
@@ -79,7 +86,7 @@ export const products: Product[] = [
         label: "Black",
         price: "$31.53",
         priceCents: 3153,
-        image: "/img/products/dad-hat-black.jpg",
+        image: "/img/products/dad-hat-black.png",
         printfulVariantId: 12689,
       },
     ],

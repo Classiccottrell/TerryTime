@@ -118,7 +118,7 @@ export default function ReceiptShopPage() {
         </p>
         <div>
           <span>Terry Terry Larry Berry</span>
-          <Link href="/shop">Choose another shop ↗</Link>
+          <Link href="/lifestyle">After hours ↗</Link>
         </div>
       </footer>
     </main>

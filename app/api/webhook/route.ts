@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createPrintfulOrder } from "@/lib/printful";
+import { getVariant } from "@/lib/products";
 
 export const runtime = "nodejs";
 
@@ -40,7 +41,9 @@ export async function POST(req: Request) {
         `[webhook] Paid: ${session.metadata?.productId ?? "unknown"} — ${session.id}`
       );
 
-      const printfulVariantId = Number(session.metadata?.printfulVariantId);
+      // Look the variant up server-side rather than trusting ids echoed in metadata.
+      const found = getVariant(session.metadata?.variantId ?? "");
+      const printfulVariantId = found?.variant.printfulVariantId;
       const shipping = session.collected_information?.shipping_details;
 
       if (!printfulVariantId || !shipping?.address) {
@@ -54,7 +57,8 @@ export async function POST(req: Request) {
         const order = await createPrintfulOrder({
           externalId: session.id,
           printfulVariantId,
-          quantity: 1,
+          printfulSyncVariantId: found?.variant.printfulSyncVariantId,
+          quantity: Math.max(1, Number(session.metadata?.quantity) || 1),
           recipient: {
             name: shipping.name ?? session.customer_details?.name ?? "Customer",
             email: session.customer_details?.email ?? undefined,

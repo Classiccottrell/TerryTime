@@ -92,7 +92,7 @@ export default function ArchiveShopPage() {
 
       <footer className="archive-footer">
         <p>File remains open.<br />Terry keeps appearing.</p>
-        <Link href="/shop">Return to storefront index</Link>
+        <Link href="/lifestyle">After hours ↗</Link>
       </footer>
     </main>
   );

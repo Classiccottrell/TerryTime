@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripe, CURRENCY } from "@/lib/stripe";
 import { getVariant } from "@/lib/products";
+import { routeForPath } from "@/lib/shop-routes.mjs";
 
 export const runtime = "nodejs";
 
@@ -10,6 +11,25 @@ function siteOrigin(req: Request): string {
     req.headers.get("origin") ||
     new URL(req.url).origin
   );
+}
+
+/**
+ * Which A/B storefront the buyer was on, read from the Referer path. Recorded
+ * on the Stripe session so conversion can be compared per store; falls back to
+ * "other" (e.g. the lifestyle page) so a missing header never blocks checkout.
+ */
+function storeFromReferer(req: Request) {
+  try {
+    const referer = req.headers.get("referer");
+    return referer ? routeForPath(new URL(referer).pathname) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function shippingCents(): number {
+  const cents = Number(process.env.SHIPPING_FLAT_CENTS);
+  return Number.isInteger(cents) && cents >= 0 ? cents : 1295;
 }
 
 export async function POST(req: Request) {
@@ -49,6 +69,7 @@ export async function POST(req: Request) {
   }
 
   const origin = siteOrigin(req);
+  const store = storeFromReferer(req);
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -69,9 +90,27 @@ export async function POST(req: Request) {
       ],
       // Stickers ship — collect an address.
       shipping_address_collection: { allowed_countries: ["CA", "US"] },
-      metadata: { productId: product.id, variantId: variant.id, printfulVariantId: String(variant.printfulVariantId) },
+      // Printful bills shipping per order, so charge it here or it comes out of margin.
+      // Flat rates (cents) are placeholders until real Printful rates are reviewed.
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: "fixed_amount",
+            display_name: "Standard (Printful, 5–10 business days)",
+            fixed_amount: { amount: shippingCents(), currency: CURRENCY },
+          },
+        },
+      ],
+      metadata: {
+        productId: product.id,
+        variantId: variant.id,
+        printfulVariantId: String(variant.printfulVariantId),
+        quantity: String(quantity),
+        store: store?.shortLabel.toLowerCase() ?? "other",
+        ab_variant: store?.variant ?? "none",
+      },
       success_url: `${origin}/shop/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/shop?canceled=1`,
+      cancel_url: `${origin}${store?.href ?? "/shop"}?canceled=1`,
     });
 
     return NextResponse.json({ url: session.url });

@@ -13,14 +13,17 @@ export type PrintfulRecipient = {
 };
 
 /**
- * Creates a real Printful order for one line item, in draft (unconfirmed)
- * state — it shows up in the Printful dashboard for review before it
- * actually ships. Requires PRINTFUL_API_KEY (an all-access/orders-scoped
+ * Creates a real Printful order for one line item. Unconfirmed (draft) unless
+ * PRINTFUL_AUTO_CONFIRM=true — a draft shows up in the Printful dashboard for
+ * review before it actually ships. Requires PRINTFUL_API_KEY (an all-access/orders-scoped
  * token) in the environment; returns null if it isn't set so the webhook
  * can degrade to logging instead of crashing.
  */
 export async function createPrintfulOrder(params: {
   externalId: string;
+  /** Printful *store sync* variant id (carries the design files). */
+  printfulSyncVariantId?: number;
+  /** Catalog variant id: only valid if the caller also supplies print files. */
   printfulVariantId: number;
   quantity: number;
   recipient: PrintfulRecipient;
@@ -40,13 +43,15 @@ export async function createPrintfulOrder(params: {
       recipient: params.recipient,
       items: [
         {
-          variant_id: params.printfulVariantId,
+          ...(params.printfulSyncVariantId
+            ? { sync_variant_id: params.printfulSyncVariantId }
+            : { variant_id: params.printfulVariantId }),
           quantity: params.quantity,
         },
       ],
-      // Draft, not confirmed — nothing ships until someone approves it in
-      // the Printful dashboard. Flip to true once you trust the pipeline.
-      confirm: false,
+      // Draft by default: nothing ships until approved in the Printful dashboard.
+      // Set PRINTFUL_AUTO_CONFIRM=true at launch to fulfil (and bill) automatically.
+      confirm: process.env.PRINTFUL_AUTO_CONFIRM === "true",
     }),
   });
 

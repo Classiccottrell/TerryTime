@@ -1,6 +1,6 @@
 {
   "name": "terry-time",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "description": "Terry Terry Larry Berry — an East Van underground art collective masquerading as a sticker brand.",
   "scripts": {
@@ -8,15 +8,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --test lib/*.test.mjs"
+    "test": "node --test lib/*.test.mjs",
+    "verify:live": "node scripts/verify-live.mjs"
   },
   "dependencies": {
-    "@types/three": "^0.185.4",
     "next": "^15.5.24",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "stripe": "^18.0.0",
-    "three": "^0.185.1"
+    "stripe": "^18.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
