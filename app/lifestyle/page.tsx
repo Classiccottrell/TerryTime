@@ -167,7 +167,7 @@ export default function LifestylePage() {
       <section className="life-coda" aria-labelledby="life-coda-title">
         <h2 id="life-coda-title">Clock out.<br />Make something.</h2>
         <Link href="/shop" className="shop-text-link">
-          Pick a store <span>↗</span>
+          Back to the shop <span>↗</span>
         </Link>
       </section>
 

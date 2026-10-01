@@ -4,14 +4,19 @@ import Link from "next/link";
 import { CanceledBanner } from "@/components/CanceledBanner";
 import { ProductPurchase } from "@/components/ProductPurchase";
 import { ShopNavigation } from "@/components/ShopNavigation";
-import { products } from "@/lib/products";
+import { formatPrice, products, startingPriceCents, type Product } from "@/lib/products";
 
 export const metadata: Metadata = {
   title: "Corner Store Receipt",
   description: "Terry Time goods rung up on one long thermal receipt from East Vancouver.",
 };
 
-const shelfTotalCents = products.reduce((sum, product) => sum + product.variants[0].priceCents, 0);
+const shelfTotalCents = products.reduce((sum, product) => sum + startingPriceCents(product), 0);
+
+function sizeSummary(product: Product) {
+  const { variants } = product;
+  return variants.length === 1 ? "" : ` / ${variants[0].label}–${variants[variants.length - 1].label}`;
+}
 
 // Deterministic barcode: bar widths come from the store code's char codes,
 // so the stripe pattern is stable across builds without shipping an image.
@@ -68,7 +73,7 @@ export default function ReceiptShopPage() {
                       <span>{String(index + 1).padStart(2, "0")}</span>
                       <h3>{product.name}</h3>
                       <i aria-hidden="true" />
-                      <span>{variant.price}</span>
+                      <span>{formatPrice(startingPriceCents(product))}</span>
                     </div>
                     <div className="receipt-item__image">
                       <Image
@@ -80,7 +85,7 @@ export default function ReceiptShopPage() {
                       />
                     </div>
                     <p className="receipt-item__meta">
-                      {variant.label} / Design: {product.voice}
+                      {variant.color}{sizeSummary(product)} / Design: {product.voice}
                     </p>
                     <p className="receipt-item__blurb">{product.blurb}</p>
                     <ProductPurchase product={product} />
@@ -118,7 +123,7 @@ export default function ReceiptShopPage() {
         </p>
         <div>
           <span>Terry Terry Larry Berry</span>
-          <Link href="/shop">Choose another shop ↗</Link>
+          <Link href="/lifestyle">After hours ↗</Link>
         </div>
       </footer>
     </main>

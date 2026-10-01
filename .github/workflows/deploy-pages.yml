@@ -44,10 +44,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Route handlers (POST) can't be statically exported. Drop them so the
-      # export build succeeds; the source on the branch is untouched.
-      - name: Remove server-only API routes
-        run: rm -rf app/api
+      # Route handlers (POST) and middleware (the A/B split) can't be statically
+      # exported. Drop them so the export build succeeds; the source on the
+      # branch is untouched. "/" and "/shop" then redirect to Archive.
+      - name: Remove server-only API routes and middleware
+        run: rm -rf app/api middleware.ts
 
       - name: Build static export
         run: npm run build

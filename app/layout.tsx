@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     default: "TerryTime Shop",
     template: "%s · TerryTime",
   },
-  description: "TerryTime sticker and merch shop — real Printful stock, Stripe checkout.",
+  description: "Embroidered East Van apparel from Terry Time. Polo, hoodie and dad hat, printed to order.",
 };
 
 export default function RootLayout({

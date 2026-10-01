@@ -4,7 +4,7 @@ import Link from "next/link";
 import { CanceledBanner } from "@/components/CanceledBanner";
 import { ProductPurchase } from "@/components/ProductPurchase";
 import { ShopNavigation } from "@/components/ShopNavigation";
-import { products } from "@/lib/products";
+import { formatPrice, products, startingPriceCents } from "@/lib/products";
 
 export const metadata: Metadata = {
   title: "Street Evidence Archive",
@@ -78,8 +78,11 @@ export default function ArchiveShopPage() {
                 <dl>
                   <div><dt>Condition</dt><dd>Ready for circulation</dd></div>
                   <div><dt>Marking</dt><dd>Embroidered Terry face</dd></div>
-                  <div><dt>Finish</dt><dd>{product.variants[0].label}</dd></div>
-                  <div><dt>Value</dt><dd>{product.variants[0].price} CAD</dd></div>
+                  <div><dt>Finish</dt><dd>{product.variants[0].color}</dd></div>
+                  {product.variants.length > 1 && (
+                    <div><dt>Sizes</dt><dd>{product.variants.map((v) => v.label).join(" / ")}</dd></div>
+                  )}
+                  <div><dt>Value</dt><dd>{formatPrice(startingPriceCents(product))} CAD</dd></div>
                 </dl>
                 <p>{product.blurb}</p>
                 <ProductPurchase product={product} />
@@ -92,7 +95,7 @@ export default function ArchiveShopPage() {
 
       <footer className="archive-footer">
         <p>File remains open.<br />Terry keeps appearing.</p>
-        <Link href="/shop">Return to storefront index</Link>
+        <Link href="/lifestyle">After hours ↗</Link>
       </footer>
     </main>
   );

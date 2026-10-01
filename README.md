@@ -15,11 +15,14 @@ nothing is lost — it's just not part of this repo anymore.
   cobalt Brutal UX design system across the shop previews (`app/globals.css`) — ported
   from [Classiccottrell/Brutal-UX](https://github.com/Classiccottrell/Brutal-UX)
 
-`/` redirects straight to the `/shop` design chooser. Seven live storefront
-directions share the same catalog and checkout: `/shop/city`, `/shop/archive`,
-`/shop/shrine`, `/shop/grid`, `/shop/stencil`, `/shop/kiosk`, and `/shop/receipt`.
-`/lifestyle` is a shoppable lookbook ("After hours") that pairs each East Van
-photo with one product and its Buy button, linked from every shop's nav. Checkout runs on Next.js route handlers
+`/` and `/shop` run an **A/B split** between the two launch storefronts —
+`/shop/archive` (A, Street Evidence Archive) and `/shop/receipt` (B, Corner Store
+Receipt) — via `middleware.ts`: 50/50, pinned per visitor with a `tt_variant`
+cookie, `?v=a|b` to force one. Each Stripe session records `store` and
+`ab_variant` metadata. The other five storefront directions (City, Shrine, Grid,
+Stencil, Kiosk) live on the `archive/unused-stores` branch. `/lifestyle` is a
+shoppable lookbook ("After hours") linked from both stores. On a static export
+(GitHub Pages) middleware is dropped and `/shop` redirects to Archive. Checkout runs on Next.js route handlers
 (Node runtime); the site builds and runs with no secrets, and checkout turns
 on the moment you add a Stripe key.
 
@@ -54,6 +57,16 @@ on the moment you add a Stripe key.
 - Without any of these set, the buttons show an honest "not live yet" message.
 
 Copy `.env.example` → `.env.local` and fill in what you want to enable.
+Then `npm run verify:live` (add `-- --discover`, `-- --draft-order`, `-- --site <url>`)
+smoke-tests Printful and Stripe: auth, variants, margins, test checkout, webhook.
+
+Shipping (CA + US): the buyer enters country / province-state / postal code; the server prices it from Printful's live `/shipping/rates` for that address (flat fallback per country if Printful is down) and Stripe is locked to that country. Sizes are S–XL for the polo and hoodie; the hat is one size.
+
+Sizes: each size is its own variant, linked to Printful by `npm run sync:printful`
+(writes `lib/printful-map.mjs`); unlinked sizes can't be bought.
+
+Launch docs: `docs/golive-todo.md`, `docs/launch-roadmap.md`, `docs/copy-deck.md`,
+`docs/site-pages.md`, `docs/lifestyle-photo-assessment.md`.
 
 ## Getting Started
 
@@ -74,40 +87,27 @@ TerryTime/
 │   ├── layout.tsx             # Minimal root layout
 │   ├── globals.css            # Base tokens + scoped .shop-brutal cobalt system
 │   ├── page.tsx                # Redirects to /shop
-│   ├── shop/page.tsx          # Storefront design chooser
-│   ├── shop/city/page.tsx     # Kinetic Cobalt Relay City storefront
-│   ├── shop/archive/page.tsx  # Street Evidence Archive storefront
-│   ├── shop/shrine/page.tsx   # Minimal Signal Shrine storefront
-│   ├── shop/grid/page.tsx     # Terminal Grid — dense, edge-to-edge catalog
-│   ├── shop/stencil/page.tsx  # Wheatpaste Stencil — street posters / flyers
-│   ├── shop/kiosk/page.tsx    # Newsstand Kiosk — serif editorial, ink-field classifieds
-│   ├── shop/receipt/page.tsx  # Corner Store Receipt — one long thermal tape on an ink counter
+│   ├── shop/page.tsx          # Fallback redirect (middleware does the A/B split)
+│   ├── shop/archive/page.tsx  # Store A — Street Evidence Archive
+│   ├── shop/receipt/page.tsx  # Store B — Corner Store Receipt
 │   ├── lifestyle/page.tsx     # After Hours lifestyle lookbook — timestamped photos + product kits
 │   ├── shop/success/page.tsx
 │   └── api/                    # checkout, subscribe, webhook route handlers
 ├── components/                 # Checkout controls, design navigation, visual effects
+├── middleware.ts               # A/B split for / and /shop
+├── scripts/verify-live.mjs     # Printful + Stripe go-live smoke test
 ├── lib/                        # Catalog, shop route registry, Stripe, site helpers
 ├── public/img/products/        # Approved local product photography (polo, hoodie, dad hat)
 ├── public/img/shop/            # Shop hero collage photos, terry-face.svg mascot asset
-└── public/models/               # custom-holographic.glb — Three.js Mascot3D model
 ```
 
 ## Design System — Brutal UX (cobalt)
 
-The shop chooser, all seven storefront directions, and the lifestyle page opt into `.shop-design`:
-`#1233c7` cobalt ink on `#f7f6f1` warm paper (or the inverse), zero border
-radius and zero shadow. City, Archive, Shrine, Grid, Stencil, Kiosk, and Receipt intentionally use
-separate compositions while sharing catalog, checkout, and preview
-navigation — Grid (`supreme.com`-inspired) skips the collage/hero flourish
-entirely for a dense, edge-to-edge product grid; Stencil treats each product as a
-wheatpaste flyer with stacked poster sheets; Kiosk inverts to an ink-black field
-with serif editorial type (the one direction that breaks from the shared
-monospace system) and lists products as classified-ad listings; Receipt pins its intro
-beside a halftone ink counter where the catalog prints out as one thermal receipt
-(line items, dot leaders, a shelf total, a CSS-masked torn edge). The lifestyle
-page runs its photos as a cobalt duotone while product shots stay true to color. Source of truth for the
-underlying system:
-[Classiccottrell/Brutal-UX](https://github.com/Classiccottrell/Brutal-UX).
+Both storefronts and the lifestyle page opt into `.shop-design`: `#1233c7` cobalt
+ink on `#f7f6f1` warm paper, zero border radius and zero shadow. Archive uses
+documentary contact sheets and product dossiers; Receipt prints the catalog as
+one long thermal tape (line items, dot leaders, a shelf total, a torn edge).
+Source of truth: [Classiccottrell/Brutal-UX](https://github.com/Classiccottrell/Brutal-UX).
 
 ## Deploy
 
