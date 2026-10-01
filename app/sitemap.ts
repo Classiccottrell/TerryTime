@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+export const dynamic = "force-static";
+
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://terryterrylarryberry.com";
 
 // "/" is listed once for the A/B split rather than both stores, so search engines
