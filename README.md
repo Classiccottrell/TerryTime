@@ -15,9 +15,11 @@ nothing is lost — it's just not part of this repo anymore.
   cobalt Brutal UX design system across the shop previews (`app/globals.css`) — ported
   from [Classiccottrell/Brutal-UX](https://github.com/Classiccottrell/Brutal-UX)
 
-`/` redirects straight to the `/shop` design chooser. Six live storefront
+`/` redirects straight to the `/shop` design chooser. Seven live storefront
 directions share the same catalog and checkout: `/shop/city`, `/shop/archive`,
-`/shop/shrine`, `/shop/grid`, `/shop/stencil`, and `/shop/kiosk`. Checkout runs on Next.js route handlers
+`/shop/shrine`, `/shop/grid`, `/shop/stencil`, `/shop/kiosk`, and `/shop/receipt`.
+`/lifestyle` is a shoppable lookbook ("After hours") that pairs each East Van
+photo with one product and its Buy button, linked from every shop's nav. Checkout runs on Next.js route handlers
 (Node runtime); the site builds and runs with no secrets, and checkout turns
 on the moment you add a Stripe key.
 
@@ -79,6 +81,8 @@ TerryTime/
 │   ├── shop/grid/page.tsx     # Terminal Grid — dense, edge-to-edge catalog
 │   ├── shop/stencil/page.tsx  # Wheatpaste Stencil — street posters / flyers
 │   ├── shop/kiosk/page.tsx    # Newsstand Kiosk — serif editorial, ink-field classifieds
+│   ├── shop/receipt/page.tsx  # Corner Store Receipt — one long thermal tape on an ink counter
+│   ├── lifestyle/page.tsx     # After Hours lifestyle lookbook — timestamped photos + product kits
 │   ├── shop/success/page.tsx
 │   └── api/                    # checkout, subscribe, webhook route handlers
 ├── components/                 # Checkout controls, design navigation, visual effects
@@ -90,15 +94,18 @@ TerryTime/
 
 ## Design System — Brutal UX (cobalt)
 
-The shop chooser and all six storefront directions opt into `.shop-design`:
+The shop chooser, all seven storefront directions, and the lifestyle page opt into `.shop-design`:
 `#1233c7` cobalt ink on `#f7f6f1` warm paper (or the inverse), zero border
-radius and zero shadow. City, Archive, Shrine, Grid, Stencil, and Kiosk intentionally use
+radius and zero shadow. City, Archive, Shrine, Grid, Stencil, Kiosk, and Receipt intentionally use
 separate compositions while sharing catalog, checkout, and preview
 navigation — Grid (`supreme.com`-inspired) skips the collage/hero flourish
 entirely for a dense, edge-to-edge product grid; Stencil treats each product as a
 wheatpaste flyer with stacked poster sheets; Kiosk inverts to an ink-black field
 with serif editorial type (the one direction that breaks from the shared
-monospace system) and lists products as classified-ad listings. Source of truth for the
+monospace system) and lists products as classified-ad listings; Receipt pins its intro
+beside a halftone ink counter where the catalog prints out as one thermal receipt
+(line items, dot leaders, a shelf total, a CSS-masked torn edge). The lifestyle
+page runs its photos as a cobalt duotone while product shots stay true to color. Source of truth for the
 underlying system:
 [Classiccottrell/Brutal-UX](https://github.com/Classiccottrell/Brutal-UX).
 
