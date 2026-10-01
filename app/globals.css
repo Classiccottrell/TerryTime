@@ -291,6 +291,10 @@
 .shop-variants { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; }
 .shop-design .shop-variants button { width: auto; padding: 0.45rem 0.7rem !important; }
 .shop-design .shop-variants button[aria-pressed="false"] { background: transparent !important; color: var(--shop-ink) !important; }
+.shop-design .shop-sizes { margin: 0 0 0.6rem; border: 0; padding: 0; min-width: 0; }
+.shop-design .shop-sizes legend { margin-bottom: 0.4rem; padding: 0; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.shop-design .shop-sizes .shop-variants { flex-wrap: wrap; margin-bottom: 0; }
+.shop-design .shop-variants button { min-width: 2.8rem; }
 .shop-design .checkout-canceled { margin: 0; border-color: var(--shop-ink); background: var(--shop-paper); color: var(--shop-ink); }
 .shop-design .checkout-canceled .text-red { color: var(--shop-ink); }
 

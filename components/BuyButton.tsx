@@ -4,11 +4,15 @@ import { useState } from "react";
 import type { Product, Variant } from "@/lib/products";
 import { asset, isStaticExport } from "@/lib/site";
 
-export function BuyButton({ product, variant }: { product: Product; variant: Variant }) {
+export function BuyButton({ product, variant }: { product: Product; variant: Variant | null }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function onBuy() {
+    if (!variant) {
+      setError("Pick a size first.");
+      return;
+    }
     setError(null);
     setLoading(true);
     try {
@@ -46,11 +50,11 @@ export function BuyButton({ product, variant }: { product: Product; variant: Var
     <div className="mt-5">
       <button
         onClick={onBuy}
-        disabled={loading || isStaticExport}
+        disabled={loading || isStaticExport || !variant}
         title={isStaticExport ? "Checkout runs on the live site" : undefined}
         className="w-full border border-ink bg-ink px-6 py-3 font-[family-name:var(--font-grotesk)] text-sm font-bold uppercase tracking-widest text-paper transition-colors hover:bg-red hover:border-red disabled:opacity-60"
       >
-        {loading ? "Starting…" : `Buy — ${variant.price}`}
+        {loading ? "Starting…" : variant ? `Buy — ${variant.price}` : "Select a size"}
       </button>
       {isStaticExport ? (
         <p className="mt-2 font-[family-name:var(--font-spacemono)] text-xs text-stone">

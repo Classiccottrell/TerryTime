@@ -1,5 +1,5 @@
 const PRINTFUL_STORE_ID = "18616880";
-const PRINTFUL_API = "https://api.printful.com";
+const PRINTFUL_API = process.env.PRINTFUL_API_BASE ?? "https://api.printful.com";
 
 export type PrintfulRecipient = {
   name: string;
@@ -22,9 +22,7 @@ export type PrintfulRecipient = {
 export async function createPrintfulOrder(params: {
   externalId: string;
   /** Printful *store sync* variant id (carries the design files). */
-  printfulSyncVariantId?: number;
-  /** Catalog variant id: only valid if the caller also supplies print files. */
-  printfulVariantId: number;
+  printfulSyncVariantId: number;
   quantity: number;
   recipient: PrintfulRecipient;
 }) {
@@ -43,9 +41,7 @@ export async function createPrintfulOrder(params: {
       recipient: params.recipient,
       items: [
         {
-          ...(params.printfulSyncVariantId
-            ? { sync_variant_id: params.printfulSyncVariantId }
-            : { variant_id: params.printfulVariantId }),
+          sync_variant_id: params.printfulSyncVariantId,
           quantity: params.quantity,
         },
       ],

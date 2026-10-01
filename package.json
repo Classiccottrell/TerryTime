@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "node --test lib/*.test.mjs",
-    "verify:live": "node scripts/verify-live.mjs"
+    "verify:live": "node scripts/verify-live.mjs",
+    "sync:printful": "node scripts/sync-printful.mjs"
   },
   "dependencies": {
     "next": "^15.5.24",

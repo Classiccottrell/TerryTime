@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStripe, CURRENCY } from "@/lib/stripe";
-import { getVariant } from "@/lib/products";
+import { getVariant, isFulfillable } from "@/lib/products";
 import { routeForPath } from "@/lib/shop-routes.mjs";
 
 export const runtime = "nodejs";
@@ -68,6 +68,16 @@ export async function POST(req: Request) {
     );
   }
 
+  // Fail closed: a variant with no Printful sync id would take payment and then
+  // be unfulfillable. ALLOW_UNMAPPED_VARIANTS=true is for Stripe test mode only.
+  if (!isFulfillable(variant) && process.env.ALLOW_UNMAPPED_VARIANTS !== "true") {
+    console.error(`[checkout] Refusing ${variant.id}: not linked to Printful (run npm run sync:printful).`);
+    return NextResponse.json(
+      { error: "That size isn't available right now. Try another or check back soon." },
+      { status: 409 }
+    );
+  }
+
   const origin = siteOrigin(req);
   const store = storeFromReferer(req);
 
@@ -82,8 +92,8 @@ export async function POST(req: Request) {
             currency: CURRENCY,
             unit_amount: variant.priceCents,
             product_data: {
-              name: `${product.name} — ${variant.label}`,
-              description: `${product.voice} — Printful variant ${variant.printfulVariantId}`,
+              name: `${product.name} — ${variant.color} / ${variant.label}`,
+              description: `${product.voice}`,
             },
           },
         },
@@ -104,7 +114,7 @@ export async function POST(req: Request) {
       metadata: {
         productId: product.id,
         variantId: variant.id,
-        printfulVariantId: String(variant.printfulVariantId),
+        size: variant.size,
         quantity: String(quantity),
         store: store?.shortLabel.toLowerCase() ?? "other",
         ab_variant: store?.variant ?? "none",

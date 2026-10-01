@@ -60,7 +60,10 @@ Copy `.env.example` → `.env.local` and fill in what you want to enable.
 Then `npm run verify:live` (add `-- --discover`, `-- --draft-order`, `-- --site <url>`)
 smoke-tests Printful and Stripe: auth, variants, margins, test checkout, webhook.
 
-Launch docs: `docs/launch-roadmap.md`, `docs/copy-deck.md`,
+Sizes: each size is its own variant, linked to Printful by `npm run sync:printful`
+(writes `lib/printful-map.mjs`); unlinked sizes can't be bought.
+
+Launch docs: `docs/golive-todo.md`, `docs/launch-roadmap.md`, `docs/copy-deck.md`,
 `docs/site-pages.md`, `docs/lifestyle-photo-assessment.md`.
 
 ## Getting Started

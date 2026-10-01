@@ -43,12 +43,12 @@ export async function POST(req: Request) {
 
       // Look the variant up server-side rather than trusting ids echoed in metadata.
       const found = getVariant(session.metadata?.variantId ?? "");
-      const printfulVariantId = found?.variant.printfulVariantId;
+      const printfulSyncVariantId = found?.variant.printfulSyncVariantId;
       const shipping = session.collected_information?.shipping_details;
 
-      if (!printfulVariantId || !shipping?.address) {
+      if (!found || !printfulSyncVariantId || !shipping?.address) {
         console.error(
-          `[webhook] Can't create Printful order for ${session.id} — missing variant id or shipping address.`
+          `[webhook] Can't create Printful order for ${session.id} — missing Printful sync variant or shipping address.`
         );
         break;
       }
@@ -56,8 +56,7 @@ export async function POST(req: Request) {
       try {
         const order = await createPrintfulOrder({
           externalId: session.id,
-          printfulVariantId,
-          printfulSyncVariantId: found?.variant.printfulSyncVariantId,
+          printfulSyncVariantId,
           quantity: Math.max(1, Number(session.metadata?.quantity) || 1),
           recipient: {
             name: shipping.name ?? session.customer_details?.name ?? "Customer",

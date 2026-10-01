@@ -1,5 +1,7 @@
 # Terry Time — Launch Roadmap & Marketing Plan
 
+> The actionable checklist is in `golive-todo.md`.
+
 Proposed dates assume today is **Thu Oct 1, 2026**. Everything is adjustable;
 the order matters more than the dates. Holiday anchors: Black Friday Fri Nov 27,
 Cyber Monday Nov 30. Confirm Printful's holiday shipping cutoffs in the dashboard
@@ -134,7 +136,7 @@ Target keywords (low competition, local): "East Vancouver art apparel", "Vancouv
 | --- | --- |
 | Orders fail to reach Printful (webhook down) | Webhook logs loudly; add Stripe failed-delivery alerts and check Printful drafts daily. Add retry/queue if volume grows. |
 | Shipping underpriced → loses money | Real rate review, `SHIPPING_FLAT_CENTS`, margin shown by `verify:live`. |
-| Wrong item/size shipped | Variants today are single colour/size ("Black") with no size picker, which is a blocker: apparel needs sizes. **Add size variants before launch.** |
+| Wrong item/size shipped | Size picker added (nothing preselected). Every size must be linked to a Printful sync variant via `npm run sync:printful`; unlinked sizes are refused at checkout. |
 | Tax / duties | Canadian GST/HST/PST, US sales tax, customs. Turn on Stripe Tax and decide on DDP with Printful. |
 | Copy that says "on the way" before it's printed | Fix per `copy-deck.md` §5. |
 | A/B split can contaminate | Cookie pins visitors for 30 days; links with `?v=` are for paid/specific posts. |
@@ -144,7 +146,7 @@ Target keywords (low competition, local): "East Vancouver art apparel", "Vancouv
 
 - [ ] `npm run verify:live -- --site https://<domain>` has no FAIL
 - [ ] Live Stripe keys, live webhook, one real end-to-end order shipped
-- [ ] Size variants added; sizing guide linked from each product
+- [ ] `npm run sync:printful` run and committed; sizing guide linked from each product
 - [ ] Shipping, Returns, Privacy, Terms pages live
 - [ ] Taxes decided and configured
 - [ ] Analytics tracking per store

@@ -3,7 +3,7 @@
  * Go-live smoke test for the Printful and Stripe integrations.
  *
  *   npm run verify:live                 # read-only checks + a test Checkout Session (expired immediately)
- *   npm run verify:live -- --discover   # also list Printful store products/sync-variant ids to paste into lib/products.ts
+ *   npm run verify:live -- --discover   # also list Printful store products and their sync variants (see also: npm run sync:printful)
  *   npm run verify:live -- --draft-order  # also create (then delete) a draft Printful order end to end
  *   npm run verify:live -- --site https://terryterrylarryberry.com   # also hit the deployed site
  *
@@ -83,19 +83,18 @@ async function printful() {
 
   for (const product of products) {
     for (const v of product.variants) {
-      const label = `${product.name} / ${v.label}`;
-      const cat = await pf(`/products/variant/${v.printfulVariantId}`);
-      if (!cat.ok) { record("FAIL", `${label}: catalog variant ${v.printfulVariantId} exists`, `${cat.status}`); continue; }
-      const cv = cat.body.result.variant;
-      record(cv.in_stock === false ? "WARN" : "PASS", `${label}: catalog variant ${v.printfulVariantId}`,
-        `${cv.name}${cv.in_stock === false ? " — OUT OF STOCK" : ""}`);
-
-      const sv = syncVariants.find((s) => s.id === v.printfulSyncVariantId) ??
-                 syncVariants.find((s) => s.variant_id === v.printfulVariantId);
-      if (!sv) { record("FAIL", `${label}: store sync variant`, "none found for this catalog variant — product not in the Printful store"); continue; }
-      if (v.printfulSyncVariantId !== sv.id) {
-        record("WARN", `${label}: printfulSyncVariantId`, `not set in lib/products.ts; set it to ${sv.id}`);
-      } else record("PASS", `${label}: printfulSyncVariantId matches store`, String(sv.id));
+      const label = `${product.name} / ${v.color} / ${v.label}`;
+      if (!v.printfulSyncVariantId) {
+        record("FAIL", `${label}: linked to Printful`, "no sync variant in lib/printful-map.mjs — run npm run sync:printful");
+        continue;
+      }
+      const sv = syncVariants.find((s) => s.id === v.printfulSyncVariantId);
+      if (!sv) { record("FAIL", `${label}: sync variant ${v.printfulSyncVariantId} exists in the store`, "not found"); continue; }
+      const cat = await pf(`/products/variant/${sv.variant_id}`);
+      if (cat.ok) {
+        const cv = cat.body.result.variant;
+        record(cv.in_stock === false ? "WARN" : "PASS", `${label}: stock`, cv.in_stock === false ? "OUT OF STOCK" : cv.name);
+      }
 
       const est = await pf(`/orders/estimate-costs`, {
         method: "POST",
@@ -105,15 +104,16 @@ async function printful() {
       const c = est.body.result.costs;
       const retail = v.priceCents / 100;
       const flatShip = (Number(process.env.SHIPPING_FLAT_CENTS) || 1295) / 100;
-      const margin = retail + flatShip - Number(c.total);
-      record(margin > 0 ? "PASS" : "FAIL", `${label}: margin (CA)`,
-        `retail ${money(retail)} + ship ${money(flatShip)} - Printful ${money(c.total)} (item ${money(c.subtotal)}, ship ${money(c.shipping)}, tax ${money(c.tax)}) = ${money(margin)}`);
+      const fees = (retail + flatShip) * 0.029 + 0.3;
+      const margin = retail + flatShip - Number(c.total) - fees;
+      record(margin > 0 ? "PASS" : "FAIL", `${label}: margin (CA, after ~Stripe fees)`,
+        `retail ${money(retail)} + ship ${money(flatShip)} - Printful ${money(c.total)} - fees ${money(fees)} = ${money(margin)}`);
     }
   }
 
   if (flag("--draft-order")) {
-    const v = products[0].variants[0];
-    const sv = syncVariants.find((s) => s.variant_id === v.printfulVariantId || s.id === v.printfulSyncVariantId);
+    const v = products.flatMap((p) => p.variants).find((x) => x.printfulSyncVariantId);
+    const sv = v && syncVariants.find((s) => s.id === v.printfulSyncVariantId);
     if (!sv) return record("FAIL", "draft order round-trip", "no sync variant to order");
     const created = await pf(`/orders`, {
       method: "POST",
@@ -198,7 +198,7 @@ async function site(base) {
     "A/B split on /shop", `→ ${loc || ab?.status}`);
   const co = await fetch(root + "/api/checkout", {
     method: "POST", headers: { "Content-Type": "application/json", Referer: `${root}/shop/receipt` },
-    body: JSON.stringify({ productId: products[0].variants[0].id }),
+    body: JSON.stringify({ productId: products.flatMap((p) => p.variants).find((x) => x.printfulSyncVariantId)?.id ?? products[0].variants[0].id }),
   }).catch(() => null);
   const data = await co?.json().catch(() => null);
   record(co?.ok && data?.url?.startsWith("https://checkout.stripe.com") ? "PASS" : "FAIL", "POST /api/checkout returns a Stripe URL", String(co?.status));
