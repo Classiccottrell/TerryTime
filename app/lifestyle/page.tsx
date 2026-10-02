@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ProductPurchase } from "@/components/ProductPurchase";
 import { ShopNavigation } from "@/components/ShopNavigation";
+import { SiteLinks } from "@/components/SiteLinks";
 import { products, type Product } from "@/lib/products";
 
 export const metadata: Metadata = {
@@ -173,6 +174,7 @@ export default function LifestylePage() {
 
       <footer className="life-footer">
         <span>Terry Terry Larry Berry</span>
+        <SiteLinks />
         <span>Photographed in East Vancouver</span>
       </footer>
     </main>

@@ -1,23 +1,25 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { ErrorScreen } from "@/components/ErrorScreen";
+import { ShopNavigation } from "@/components/ShopNavigation";
+
+export const metadata: Metadata = {
+  title: "Not found",
+  robots: { index: false },
+};
 
 export default function NotFound() {
   return (
-    <div className="mx-auto max-w-2xl px-6 py-32 text-center">
-      <p className="font-[family-name:var(--font-display)] text-8xl sm:text-[12rem] text-red leading-none tracking-tight">
-        404
-      </p>
-      <p className="mt-4 font-[family-name:var(--font-mono)] text-lg italic text-stone">
-        “It&apos;s not here. Cut it.” — Berry, the Editor
-      </p>
-      <p className="mt-2 font-[family-name:var(--font-serif)] text-xl text-ink">
-        This page got edited out of existence.
-      </p>
-      <Link
-        href="/"
-        className="mt-8 inline-block bg-ink text-paper px-8 py-3 font-[family-name:var(--font-grotesk)] text-sm font-bold uppercase tracking-widest hover:bg-red transition-colors"
+    <main className="shop-design shop-error">
+      <ShopNavigation />
+      <ErrorScreen
+        code="404"
+        title={<>Nothing on<br />this wall.</>}
+        message="This page got painted over, or it never went up. Terry's still around."
       >
-        Back to the Studio
-      </Link>
-    </div>
+        <Link href="/shop" className="shop-text-link">Back to the shop <span>↗</span></Link>
+        <Link href="/lifestyle" className="shop-text-link">After hours <span>↗</span></Link>
+      </ErrorScreen>
+    </main>
   );
 }

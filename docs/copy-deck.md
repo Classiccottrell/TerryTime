@@ -119,13 +119,27 @@ Design credit on every product: "Terry the Sketcher".
 > Accuracy flag: "on the way" is true only once Printful ships. Items are made to
 > order, so suggest: "Your order's in. It's printed to order and ships in about a week."
 
-## 6. 404
+## 6. Error pages (one template, Terry engraving on the right)
 
-| Current | Your edit |
-| --- | --- |
-| 404 · "It's not here. Cut it." — Berry, the Editor · This page got edited out of existence. · Back to the Studio | |
+| Page | Current | Your edit |
+| --- | --- | --- |
+| 404 | Error 404 · **Nothing on this wall.** · This page got painted over, or it never went up. Terry's still around. · Back to the shop ↗ · After hours ↗ | |
+| Runtime error (500) | Error 500 · **The ink ran.** · Something broke on our side, not yours. Try again; if it keeps happening, tell us. · Ref {code} · Try again ↻ · Back to the shop ↗ · Contact ↗ | |
+| Whole-site failure | Error 500 · **The whole wall came down.** · The site hit an error it couldn't recover from. Reload, or come back in a minute. · Try again ↻ · Reload the shop ↗ | |
+| Footer links (all pages) | Shipping & returns · Sizing · Contact · Privacy · Terms | |
 
-## 7. Copy that doesn't exist yet (needed before launch)
+## 7. Customer-information pages (two options each, drafts)
+
+Each page exists twice: **Option A "Ledger"** at `/shipping`, `/sizing`, `/contact`,
+`/privacy`, `/terms` (numbered clauses, case-file voice, matches Archive) and
+**Option B "Plain talk"** at the same path plus `/b` (short Q&A, conversational,
+matches Receipt). A draft bar at the top of each switches between them. Every
+highlighted **TBD** is a fact I didn't have (email, legal name, duties, measurements,
+policy decisions). Pick A or B per page (or mix), fill the TBDs, and I'll delete
+the loser, remove the draft bar and add the page to the sitemap. Privacy and Terms
+are templates, not legal advice: get them reviewed.
+
+## 8. Copy that doesn't exist yet (needed before launch)
 
 Shipping & returns · Sizing guide · Product detail (fabric, fit, care) · About /
 the collective · Contact · Privacy & Terms · Newsletter signup line. Outlines in

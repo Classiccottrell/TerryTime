@@ -343,9 +343,10 @@
 .archive-dossier__copy dt { font-weight: 800; }
 .archive-dossier__copy > p:not(.shop-kicker) { max-width: 46ch; font-size: 0.7rem; line-height: 1.6; }
 .archive-dossier__stamp { position: absolute; right: 1.5rem; top: 1.7rem; border: 4px double var(--shop-ink); padding: 0.6rem 0.8rem; font-size: 0.62rem; font-weight: 900; line-height: 1.1; text-align: center; transform: rotate(7deg); }
-.archive-footer { display: grid; grid-template-columns: 1fr 1fr; align-items: end; border-top: 5px double var(--shop-ink); background: var(--shop-ink); color: var(--shop-paper); padding: clamp(3rem, 6vw, 6rem) clamp(1rem, 3vw, 3rem); }
+.archive-footer { position: relative; isolation: isolate; overflow: hidden; min-height: clamp(420px, 48vw, 640px); display: grid; grid-template-columns: 1fr 1fr; align-items: end; border-top: 5px double var(--shop-ink); background: var(--shop-ink); color: var(--shop-paper); padding: clamp(3rem, 6vw, 6rem) clamp(1rem, 3vw, 3rem); }
 .archive-footer p { font-size: clamp(2.5rem, 6vw, 7rem); font-weight: 900; letter-spacing: -0.08em; line-height: 0.85; text-transform: uppercase; }
-.archive-footer a { justify-self: end; border-bottom: 1px solid currentColor; padding-bottom: 0.5rem; font-size: 0.7rem; text-transform: uppercase; }
+.archive-footer__links { display: flex; flex-direction: column; align-items: flex-end; gap: 1.4rem; justify-self: end; }
+.archive-footer__links > a { border-bottom: 1px solid currentColor; padding-bottom: 0.5rem; font-size: 0.7rem; text-transform: uppercase; }
 
 /* ---- 07 — Corner Store Receipt — one long thermal tape on an ink counter.
    Split layout: paper intro pinned left, the receipt printing down a
@@ -451,6 +452,10 @@
 .receipt-barcode i { display: block; background: currentColor; }
 .receipt-tape__thanks { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.22em; text-align: center; text-transform: uppercase; }
 .receipt-footer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: clamp(420px, 48vw, 640px);
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   align-items: end;
@@ -543,6 +548,67 @@
 .life-coda .shop-text-link { color: var(--shop-paper); text-decoration: none; }
 .life-footer { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--shop-paper); background: var(--shop-ink); color: var(--shop-paper); padding: 1.3rem clamp(1rem, 4vw, 4rem); font-size: 0.62rem; text-transform: uppercase; }
 
+/* ---- Terry engraving (components/TerryEngraving) — decorative canvas behind a block ---- */
+.terry-engraving { position: absolute; inset: 0; z-index: -1; display: block; width: 100%; height: 100%; pointer-events: none; }
+
+/* ---- Error pages (components/ErrorScreen) — 404, runtime error, root error ---- */
+.error-screen { position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: center; min-height: calc(100svh - 60px); padding: clamp(2rem, 6vw, 6rem) clamp(1rem, 4vw, 4rem); }
+.error-screen__copy { position: relative; max-width: 34rem; border: 2px solid var(--shop-ink); background: var(--shop-paper); padding: clamp(1.4rem, 3vw, 2.4rem); }
+.error-screen__code { margin: 0.6rem 0 0; font-size: clamp(4.5rem, 14vw, 10rem); font-weight: 900; letter-spacing: -0.08em; line-height: 0.85; }
+.error-screen h1 { margin: 1rem 0 1.2rem; font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 900; letter-spacing: -0.05em; line-height: 0.95; text-transform: uppercase; }
+.error-screen__message { max-width: 40ch; margin: 0 0 1.6rem; font-size: 0.8rem; line-height: 1.7; }
+.error-screen__ref { display: block; margin-top: 0.6rem; font-size: 0.62rem; opacity: 0.75; }
+.error-screen__actions { display: flex; flex-wrap: wrap; gap: 1rem 1.8rem; }
+.error-screen__actions button { border: 0; border-bottom: 2px solid currentColor; background: none; color: inherit; font: inherit; cursor: pointer; }
+@media (max-width: 760px) { .error-screen { align-items: flex-end; } }
+
+/* ---- Customer-information pages (components/InfoPage) ---- */
+.info-draftbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 1.2rem; border-bottom: 1px dashed var(--shop-ink); padding: 0.6rem clamp(1rem, 4vw, 4rem); font-size: 0.6rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.info-draftbar span { margin-right: auto; }
+.info-draftbar a { text-decoration: none; padding: 0.2rem 0.4rem; border: 1px solid var(--shop-ink); }
+.info-draftbar a[aria-current="page"] { background: var(--shop-ink); color: var(--shop-paper); }
+.info-head { border-bottom: 2px solid var(--shop-ink); padding: clamp(2.5rem, 7vw, 6rem) clamp(1rem, 4vw, 4rem) 2.4rem; }
+.info-head h1 { margin: 1rem 0 1.4rem; font-size: clamp(3rem, 9vw, 7.5rem); font-weight: 900; letter-spacing: -0.07em; line-height: 0.88; text-transform: uppercase; }
+.info-head__lede { max-width: 56ch; font-size: 0.82rem; line-height: 1.7; }
+.info-head__lede p { margin: 0 0 0.6rem; }
+.info-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; border-top: 2px solid var(--shop-ink); padding: 1.3rem clamp(1rem, 4vw, 4rem); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.info-page p, .info-page li { line-height: 1.7; }
+.tbd { background: color-mix(in srgb, var(--shop-ink) 14%, transparent); color: var(--shop-ink); padding: 0 0.25em; font-weight: 800; outline: 1px dashed var(--shop-ink); }
+
+/* Option A — Ledger */
+.ledger { margin: 0; padding: 0; list-style: none; }
+.ledger > li { display: grid; grid-template-columns: minmax(12rem, 0.35fr) 1fr; gap: 1rem 3rem; border-bottom: 1px solid var(--shop-ink); padding: 2rem clamp(1rem, 4vw, 4rem); }
+.ledger h2 { display: flex; gap: 0.9rem; margin: 0; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+.ledger h2 span { font-weight: 400; opacity: 0.7; }
+.ledger__body { max-width: 68ch; font-size: 0.8rem; }
+.ledger__body > :first-child { margin-top: 0; }
+.ledger__body ul { margin: 0.4rem 0 0.8rem; padding-left: 1.1rem; }
+.ledger table, .tape table { width: 100%; border-collapse: collapse; margin: 0.4rem 0 1rem; font-size: 0.74rem; }
+.ledger th, .ledger td, .tape th, .tape td { border-bottom: 1px solid var(--shop-ink); padding: 0.5rem 0.6rem 0.5rem 0; text-align: left; vertical-align: top; }
+.ledger th, .tape th { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* Option B — Plain talk (tape) */
+.tape { max-width: 40rem; margin: clamp(2rem, 6vw, 5rem) auto; border: 2px solid var(--shop-ink); padding: clamp(1.2rem, 4vw, 2.6rem); }
+.tape dl { margin: 0; }
+.tape dl > div { border-bottom: 1px dashed var(--shop-ink); padding: 1.2rem 0; }
+.tape dl > div:first-child { padding-top: 0; }
+.tape dt { margin-bottom: 0.5rem; font-size: 0.82rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em; }
+.tape dd { margin: 0; font-size: 0.8rem; }
+.tape dd p { margin: 0 0 0.5rem; }
+.tape__foot { margin: 1.4rem 0 0; font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.info-form { display: grid; gap: 0.9rem; }
+.info-form label { display: grid; gap: 0.3rem; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.info-form input, .info-form select, .info-form textarea { border: 1px solid var(--shop-ink); background: transparent; padding: 0.6rem; color: var(--shop-ink); font: inherit; font-size: 0.8rem; letter-spacing: normal; text-transform: none; }
+.info-form button { justify-self: start; border: 2px solid var(--shop-ink); background: var(--shop-ink); padding: 0.7rem 1.2rem; color: var(--shop-paper); font: inherit; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
+@media (max-width: 760px) { .ledger > li { grid-template-columns: 1fr; } }
+
+/* ---- Footer links to the customer-information pages ---- */
+.site-links ul { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.4rem 1.1rem; margin: 0; padding: 0; list-style: none; }
+.site-links a { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-decoration: none; text-transform: uppercase; }
+.site-links a:hover, .site-links a:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
+.life-footer .site-links ul { justify-content: center; }
+.receipt-footer .site-links a { border-bottom: 0; padding-bottom: 0; }
+
 /* ---- Order confirmation — shared across every direction, no chooser context ---- */
 .shop-success { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; min-height: 100vh; padding: 4rem 1.5rem; text-align: center; }
 .shop-success h1 { margin: 0; font-size: clamp(3rem, 9vw, 6rem); font-weight: 900; text-transform: uppercase; }
@@ -598,8 +664,9 @@
   .archive-dossier__image { min-height: 370px; }
   .archive-dossier__copy { grid-column: 2; padding: 1rem 0; }
   .archive-dossier__stamp { display: none; }
-  .archive-footer { grid-template-columns: 1fr; gap: 3rem; }
-  .archive-footer a { justify-self: start; }
+  .archive-footer { grid-template-columns: 1fr; align-content: start; gap: 3rem; min-height: 780px; }
+  .archive-footer__links { align-items: flex-start; justify-self: start; }
+  .site-links ul { justify-content: flex-start; }
 
   .shrine-hero { min-height: 760px; }
   .shrine-hero h1 { top: 17%; display: block; font-size: 22vw; }
@@ -645,7 +712,7 @@
   .receipt-intro h1 { font-size: clamp(3.4rem, 17vw, 6rem); }
   .receipt-counter { padding: 2.5rem 1rem 4rem; }
   .receipt-tape { transform: none; padding-inline: 1.1rem; }
-  .receipt-footer { grid-template-columns: 1fr; gap: 2.5rem; }
+  .receipt-footer { grid-template-columns: 1fr; align-content: start; gap: 2.5rem; min-height: 780px; }
   .receipt-footer > div { align-items: flex-start; }
 
   .life-hero { display: block; padding-top: 3rem; }
