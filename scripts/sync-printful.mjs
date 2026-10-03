@@ -59,7 +59,7 @@ const catalogCache = new Map();
 /** Sizes Printful actually offers for this blank in this colour (catalog, not our store). */
 async function catalogSizes(catalogVariantId, color) {
   const variant = await pf(`/products/variant/${catalogVariantId}`);
-  const productId = variant.product.product_id;
+  const productId = variant.variant.product_id;
   if (!catalogCache.has(productId)) catalogCache.set(productId, await pf(`/products/${productId}`));
   const catalog = catalogCache.get(productId);
   const rows = catalog.variants.filter((v) => norm(v.color) === norm(color));
