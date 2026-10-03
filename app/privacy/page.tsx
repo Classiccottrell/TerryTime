@@ -56,7 +56,6 @@ export default function PrivacyA() {
             body: (
               <ul>
                 <li><code>tt_variant</code> cookie (30 days): remembers which of our two shop designs you were shown, so the site doesn&apos;t switch on you.</li>
-                <li><code>tt_ship_to</code> (stored in your browser): the location you entered for shipping, so you only type it once.</li>
                 <li>No advertising or cross-site tracking cookies.</li>
               </ul>
             ),

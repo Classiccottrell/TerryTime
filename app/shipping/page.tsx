@@ -21,13 +21,13 @@ export default function ShippingA() {
         sections={[
           {
             label: "Where we ship",
-            body: <p>Canada and the United States. Pick your country, province or state, and postal code on any product before checkout; checkout then only accepts addresses in that country.</p>,
+            body: <p>Canada and the United States. You enter your address at checkout.</p>,
           },
           {
             label: "Cost",
             body: (
               <>
-                <p>Shipping is priced live for your address, at Printful&apos;s rate for that exact order, and shown before you pay. We don&apos;t pad it. <Tbd>confirm: at cost, at cost + buffer, or free over a threshold</Tbd></p>
+                <p>Shipping is one flat rate per item, set from Printful&apos;s live rates and shown at checkout before you pay. In Canada it&apos;s what Printful charges us; US orders carry a small extra. <Tbd>confirm: at cost, at cost + buffer, or free over a threshold</Tbd></p>
                 <p>Prices are in Canadian dollars.</p>
               </>
             ),

@@ -33,7 +33,7 @@ const record = (status, name, detail = "") => {
 };
 
 const { products } = await import("../lib/products.ts");
-const { quoteShipping } = await import("../lib/shipping.ts");
+const { quoteCheckoutShipping } = await import("../lib/shipping.ts");
 const DESTINATIONS = [
   { name: "Vancouver, BC", destination: { country: "CA", state: "BC", postalCode: "V5N 4B6" },
     recipient: { name: "Terry Test", address1: "2300 Commercial Dr", city: "Vancouver", state_code: "BC", country_code: "CA", zip: "V5N 4B6" } },
@@ -115,7 +115,7 @@ async function printful() {
         });
         if (!est.ok) { record("FAIL", `${label}: cost estimate → ${dest.name}`, `${est.status} ${est.body?.error?.message ?? ""}`); continue; }
         const c = est.body.result.costs;
-        const q = await quoteShipping({ printfulVariantId: v.printfulVariantId, quantity: 1, destination: dest.destination });
+        const q = await quoteCheckoutShipping(v.printfulVariantId, 1);
         const retail = v.priceCents / 100;
         const charged = retail + q.amountCents / 100;
         const fees = charged * 0.029 + 0.3;

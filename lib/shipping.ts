@@ -116,3 +116,18 @@ export async function quoteShipping(params: {
     return fallback;
   }
 }
+
+/** Printful shipping is flat within each country, so one address per country prices it. */
+const REPRESENTATIVE: Destination[] = [
+  { country: "CA", state: "BC", postalCode: "V5N 4B6" },
+  { country: "US", state: "NY", postalCode: "10001" },
+];
+
+/**
+ * The one shipping charge for Stripe's hosted page, which collects the address but can't
+ * re-price per address: the highest of the per-country quotes (Canada at cost, US + upcharge).
+ */
+export async function quoteCheckoutShipping(printfulVariantId: number | undefined, quantity: number): Promise<ShippingQuote> {
+  const quotes = await Promise.all(REPRESENTATIVE.map((destination) => quoteShipping({ printfulVariantId, quantity, destination })));
+  return quotes.reduce((max, q) => (q.amountCents > max.amountCents ? q : max));
+}

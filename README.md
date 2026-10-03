@@ -62,7 +62,7 @@ Copy `.env.example` → `.env.local` and fill in what you want to enable.
 Then `npm run verify:live` (add `-- --discover`, `-- --draft-order`, `-- --site <url>`)
 smoke-tests Printful and Stripe: auth, variants, margins, test checkout, webhook.
 
-Shipping (CA + US): the buyer enters country / province-state / postal code; the server prices it from Printful's live `/shipping/rates` for that address (flat fallback per country if Printful is down) and Stripe is locked to that country. Sizes are S–XL for the polo and hoodie; the hat is one size.
+Shipping (CA + US): the product card is size → Buy; Stripe's hosted page collects the address (Canada or US). Stripe's hosted page can't re-price by address, so checkout charges one shipping line per order: the higher of Printful's live Canadian rate and the US rate + `SHIPPING_UPCHARGE_US_CENTS` (Printful shipping is flat within each country). Flat fallback per country if Printful is down. Sizes are S–XL for the polo and hoodie; the hat is one size.
 
 Sizes: each size is its own variant, linked to Printful by `npm run sync:printful`
 (writes `lib/printful-map.mjs`); unlinked sizes can't be bought.
