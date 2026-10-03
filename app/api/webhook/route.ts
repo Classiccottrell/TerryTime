@@ -41,6 +41,12 @@ export async function POST(req: Request) {
         `[webhook] Paid: ${session.metadata?.productId ?? "unknown"} — ${session.id}`
       );
 
+      // Async payment methods complete the session before the money arrives; only fulfil paid sessions.
+      if (session.payment_status !== "paid") {
+        console.warn(`[webhook] ${session.id} completed but not paid (${session.payment_status}); not creating a Printful order.`);
+        break;
+      }
+
       // Look the variant up server-side rather than trusting ids echoed in metadata.
       const found = getVariant(session.metadata?.variantId ?? "");
       const printfulSyncVariantId = found?.variant.printfulSyncVariantId;
@@ -51,6 +57,13 @@ export async function POST(req: Request) {
           `[webhook] Can't create Printful order for ${session.id} — missing Printful sync variant or shipping address.`
         );
         break;
+      }
+
+      // Shipping was quoted for the region typed on the site; Stripe only locks the country.
+      const quotedFor = session.metadata?.ship_to;
+      const shippedTo = `${shipping.address.country}-${shipping.address.state}`;
+      if (quotedFor && quotedFor !== shippedTo) {
+        console.warn(`[webhook] ${session.id}: shipping quoted for ${quotedFor} but address is ${shippedTo} — check the Printful cost before confirming.`);
       }
 
       try {
