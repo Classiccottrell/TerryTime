@@ -119,11 +119,17 @@ async function printful() {
         const retail = v.priceCents / 100;
         const charged = retail + q.amountCents / 100;
         const fees = charged * 0.029 + 0.3;
-        // Digitization is a one-time embroidery setup fee per design, waived on repeat orders; not a per-order cost.
-        const cost = Number(c.total) - Number(c.digitization ?? 0);
+        // Digitization is a one-time embroidery setup fee per design, waived on repeat orders.
+        // PASS/FAIL is the repeat-order margin; the first order of a design also pays it, so show and warn on that too.
+        const digitization = Number(c.digitization ?? 0);
+        const cost = Number(c.total) - digitization;
         const margin = charged - cost - fees;
+        const firstOrder = margin - digitization;
         record(margin > 0 ? "PASS" : "FAIL", `${label} → ${dest.name}: margin`,
-          `charged ${money(charged)} (ship ${money(q.amountCents / 100)}, ${q.source}) - Printful ${money(cost)} - fees ${money(fees)} = ${money(margin)}`);
+          `charged ${money(charged)} (ship ${money(q.amountCents / 100)}, ${q.source}) - Printful ${money(cost)} - fees ${money(fees)} = ${money(margin)}` +
+          (digitization ? `; first order of this design ${money(firstOrder)} (digitization ${money(digitization)})` : ""));
+        if (digitization && firstOrder <= 0) record("WARN", `${label} → ${dest.name}: first-order margin`,
+          `${money(firstOrder)} — the one-time ${money(digitization)} digitization fee isn't charged to the buyer`);
         if (q.source === "fallback") record("WARN", `${label} → ${dest.name}: live shipping rate`, "using the flat fallback; Printful /shipping/rates didn't answer");
       }
     }
