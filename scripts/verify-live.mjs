@@ -119,9 +119,17 @@ async function printful() {
         const retail = v.priceCents / 100;
         const charged = retail + q.amountCents / 100;
         const fees = charged * 0.029 + 0.3;
-        const margin = charged - Number(c.total) - fees;
+        // Digitization is a one-time embroidery setup fee per design, waived on repeat orders.
+        // PASS/FAIL is the repeat-order margin; the first order of a design also pays it, so show and warn on that too.
+        const digitization = Number(c.digitization ?? 0);
+        const cost = Number(c.total) - digitization;
+        const margin = charged - cost - fees;
+        const firstOrder = margin - digitization;
         record(margin > 0 ? "PASS" : "FAIL", `${label} → ${dest.name}: margin`,
-          `charged ${money(charged)} (ship ${money(q.amountCents / 100)}, ${q.source}) - Printful ${money(c.total)} - fees ${money(fees)} = ${money(margin)}`);
+          `charged ${money(charged)} (ship ${money(q.amountCents / 100)}, ${q.source}) - Printful ${money(cost)} - fees ${money(fees)} = ${money(margin)}` +
+          (digitization ? `; first order of this design ${money(firstOrder)} (digitization ${money(digitization)})` : ""));
+        if (digitization && firstOrder <= 0) record("WARN", `${label} → ${dest.name}: first-order margin`,
+          `${money(firstOrder)} — the one-time ${money(digitization)} digitization fee isn't charged to the buyer`);
         if (q.source === "fallback") record("WARN", `${label} → ${dest.name}: live shipping rate`, "using the flat fallback; Printful /shipping/rates didn't answer");
       }
     }
@@ -154,13 +162,14 @@ async function stripeChecks() {
   console.log("\n== Stripe ==");
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) return record("FAIL", "STRIPE_SECRET_KEY set", "missing");
-  const mode = key.startsWith("sk_live") ? "LIVE" : key.startsWith("sk_test") ? "TEST" : key.startsWith("rk_") ? "RESTRICTED" : "UNKNOWN";
+  const mode = key.startsWith("sk_live") ? "LIVE" : key.startsWith("sk_test") ? "TEST" : key.startsWith("rk_live") ? "RESTRICTED LIVE" : key.startsWith("rk_test") ? "RESTRICTED TEST" : "UNKNOWN";
   record("PASS", "STRIPE_SECRET_KEY set", `mode: ${mode}`);
-  if (mode === "TEST") record("WARN", "Stripe is in TEST mode", "swap in the sk_live key before launch");
+  if (mode.endsWith("TEST")) record("WARN", "Stripe is in TEST mode", "swap in the sk_live key before launch");
 
   const { default: Stripe } = await import("stripe");
   const stripe = new Stripe(key);
-  try {
+  // Restricted keys usually lack Accounts Read; the Checkout session below proves auth instead.
+  if (!mode.startsWith("RESTRICTED")) try {
     const acct = await stripe.accounts.retrieve();
     record("PASS", "Stripe auth", `${acct.settings?.dashboard?.display_name ?? acct.id}, country ${acct.country}, default currency ${acct.default_currency}`);
     record(acct.charges_enabled ? "PASS" : "FAIL", "charges_enabled", String(acct.charges_enabled));

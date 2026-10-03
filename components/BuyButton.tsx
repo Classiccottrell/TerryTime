@@ -71,7 +71,7 @@ export function BuyButton({
         title={isStaticExport ? "Checkout runs on the live site" : undefined}
         className="w-full border border-ink bg-ink px-6 py-3 font-[family-name:var(--font-grotesk)] text-sm font-bold uppercase tracking-widest text-paper transition-colors hover:bg-red hover:border-red disabled:opacity-60"
       >
-        {loading ? "Starting…" : !variant ? "Select a size" : !destination ? "Add shipping location" : !quote ? "Pricing shipping…" : `Buy — ${formatPrice(quote.totalCents)}`}
+        {loading ? "Starting…" : !variant ? "Select a size" : !destination ? "Add shipping location" : !quote ? "Pricing shipping…" : `Pay — ${formatPrice(quote.totalCents)}`}
       </button>
       {isStaticExport ? (
         <p className="mt-2 font-[family-name:var(--font-spacemono)] text-xs text-stone">

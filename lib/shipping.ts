@@ -43,6 +43,15 @@ export function fallbackShippingCents(country: Destination["country"]): number {
   return country === "CA" ? envCents("SHIPPING_FALLBACK_CA_CENTS", 1195) : envCents("SHIPPING_FALLBACK_US_CENTS", 1595);
 }
 
+/**
+ * Per-country upcharge (cents, CAD) folded into the shipping line. Canada's share is built
+ * into the listed price (Canadian shop: the price you see is the price), so only the US pays
+ * extra. Covers the sales tax Printful bills us. Sized from npm run verify:live, Oct 2026.
+ */
+export function countryUpchargeCents(country: Destination["country"]): number {
+  return country === "CA" ? envCents("SHIPPING_UPCHARGE_CA_CENTS", 0) : envCents("SHIPPING_UPCHARGE_US_CENTS", 200);
+}
+
 const cache = new Map<string, { at: number; quote: ShippingQuote }>();
 const CACHE_MS = 10 * 60 * 1000;
 
@@ -53,9 +62,9 @@ export async function quoteShipping(params: {
   destination: Destination;
 }): Promise<ShippingQuote> {
   const { printfulVariantId, quantity, destination } = params;
-  const buffer = envCents("SHIPPING_BUFFER_CENTS", 0);
+  const buffer = envCents("SHIPPING_BUFFER_CENTS", 0) + countryUpchargeCents(destination.country);
   const fallback: ShippingQuote = {
-    amountCents: fallbackShippingCents(destination.country),
+    amountCents: fallbackShippingCents(destination.country) + buffer,
     source: "fallback",
     estimate: estimateFor(),
   };

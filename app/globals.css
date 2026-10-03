@@ -295,6 +295,19 @@
 .shop-design .shop-sizes legend { margin-bottom: 0.4rem; padding: 0; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
 .shop-design .shop-sizes .shop-variants { flex-wrap: wrap; margin-bottom: 0; }
 .shop-design .shop-variants button { min-width: 2.8rem; }
+/* Sizes: selected stays filled on hover; unselected tints on hover, fills on press; visible keyboard focus. */
+.shop-design .shop-variants button { cursor: pointer; touch-action: manipulation; }
+.shop-design .shop-variants button[aria-pressed="true"],
+.shop-design .shop-variants button[aria-pressed="true"]:hover { background: var(--shop-ink) !important; color: var(--shop-paper) !important; }
+.shop-design .shop-variants button[aria-pressed="false"]:hover { background: color-mix(in srgb, var(--shop-ink) 14%, transparent) !important; color: var(--shop-ink) !important; }
+.shop-design .shop-variants button:active { background: var(--shop-ink) !important; color: var(--shop-paper) !important; }
+.shop-design .shop-purchase button:focus-visible { outline: 2px solid var(--shop-ink); outline-offset: 2px; }
+
+/* Dev/preview-only store switcher (components/DevStoreSwitch.tsx). */
+.dev-store-switch { position: fixed; right: 0.75rem; bottom: 0.75rem; z-index: 1000; display: flex; border: 2px solid #1233c7; background: #f7f6f1; font: 800 0.6rem/1 ui-monospace, monospace; letter-spacing: 0.1em; text-transform: uppercase; }
+.dev-store-switch a { padding: 0.55rem 0.7rem; color: #1233c7; text-decoration: none; }
+.dev-store-switch a + a { border-left: 2px solid #1233c7; }
+.dev-store-switch a[aria-current="page"], .dev-store-switch a:hover { background: #1233c7; color: #f7f6f1; }
 .shop-design .shop-shipto { margin: 0 0 0.7rem; font-size: 0.68rem; }
 .shop-design .shop-shipto__legend { margin: 0 0 0.4rem; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
 .shop-design .shop-shipto__row { display: grid; grid-template-columns: 1fr 1fr 0.8fr; gap: 0.4rem; margin-bottom: 0.5rem; }
