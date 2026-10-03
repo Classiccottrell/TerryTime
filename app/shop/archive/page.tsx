@@ -5,7 +5,7 @@ import { CanceledBanner } from "@/components/CanceledBanner";
 import { ProductPurchase } from "@/components/ProductPurchase";
 import { ShopNavigation } from "@/components/ShopNavigation";
 import { SiteLinks } from "@/components/SiteLinks";
-import { TerryEngraving } from "@/components/TerryEngraving";
+import { TerrySymbols } from "@/components/TerrySymbols";
 import { formatPrice, products, startingPriceCents } from "@/lib/products";
 
 export const metadata: Metadata = {
@@ -96,7 +96,7 @@ export default function ArchiveShopPage() {
       </section>
 
       <footer className="archive-footer">
-        <TerryEngraving ink="#f7f6f1" paper="#1233c7" bands={56} faceX={0.76} faceScale={0.82} narrow={{ faceX: 0.5, faceY: 0.8, faceScale: 0.8 }} />
+        <TerrySymbols ink="#f7f6f1" paper="#1233c7" faceX={0.76} faceY={0.44} faceScale={0.8} narrow={{ faceX: 0.5, faceY: 0.72, faceScale: 0.86 }} />
         <p>File remains open.<br />Terry keeps appearing.</p>
         <div className="archive-footer__links">
           <Link href="/lifestyle">After hours ↗</Link>

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { TerryEngraving } from "@/components/TerryEngraving";
+import { TerrySymbols } from "@/components/TerrySymbols";
 
 /**
  * One template for every error state (404, runtime error, root-layout failure):
@@ -19,7 +19,7 @@ export function ErrorScreen({
 }) {
   return (
     <section className="error-screen" aria-labelledby="error-title">
-      <TerryEngraving bands={64} faceX={0.7} faceY={0.52} faceScale={0.78} narrow={{ faceX: 0.5, faceY: 0.24, faceScale: 0.9 }} />
+      <TerrySymbols faceX={0.7} faceY={0.5} faceScale={0.84} narrow={{ faceX: 0.5, faceY: 0.25, faceScale: 0.9 }} />
       <div className="error-screen__copy">
         <p className="shop-kicker">Error {code}</p>
         <p className="error-screen__code" aria-hidden="true">{code}</p>
