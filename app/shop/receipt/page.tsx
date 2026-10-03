@@ -5,7 +5,7 @@ import { CanceledBanner } from "@/components/CanceledBanner";
 import { ProductPurchase } from "@/components/ProductPurchase";
 import { ShopNavigation } from "@/components/ShopNavigation";
 import { SiteLinks } from "@/components/SiteLinks";
-import { TerryEngraving } from "@/components/TerryEngraving";
+import { TerrySymbols } from "@/components/TerrySymbols";
 import { formatPrice, products, startingPriceCents, type Product } from "@/lib/products";
 
 export const metadata: Metadata = {
@@ -119,7 +119,7 @@ export default function ReceiptShopPage() {
       </div>
 
       <footer className="receipt-footer">
-        <TerryEngraving bands={56} faceX={0.74} faceScale={0.82} narrow={{ faceX: 0.5, faceY: 0.8, faceScale: 0.8 }} />
+        <TerrySymbols faceX={0.74} faceY={0.44} faceScale={0.8} narrow={{ faceX: 0.5, faceY: 0.72, faceScale: 0.86 }} />
         <p>
           Paper fades.<br />
           The face stays.

@@ -67,7 +67,7 @@ Shipping (CA + US): the buyer enters country / province-state / postal code; the
 Sizes: each size is its own variant, linked to Printful by `npm run sync:printful`
 (writes `lib/printful-map.mjs`); unlinked sizes can't be bought.
 
-Footers and error pages (404, `error.tsx`, `global-error.tsx`) use `components/TerryEngraving.tsx`, a canvas piece built on linefield's contour-grid that draws the Terry face as line weight. Customer pages (`/shipping`, `/sizing`, `/contact`, `/privacy`, `/terms`) are drafts with two options each (`/page` = A, `/page/b` = B).
+Footers and error pages (404, `error.tsx`, `global-error.tsx`) use `components/TerrySymbols.tsx`: the Terry face drawing (`public/img/terry-face-drawing.png`) set in a constantly switching grid of type symbols (WebGL2, with a canvas-2D still for browsers without it and a still frame under reduced motion). Unused explorations are on the `archive/unused-stores` branch in `archive/footer-graphics/`. Customer pages (`/shipping`, `/sizing`, `/contact`, `/privacy`, `/terms`) are drafts with two options each (`/page` = A, `/page/b` = B).
 
 Launch docs: `docs/golive-todo.md`, `docs/launch-roadmap.md`, `docs/copy-deck.md`,
 `docs/site-pages.md`, `docs/lifestyle-photo-assessment.md`.
