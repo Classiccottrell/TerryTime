@@ -44,12 +44,12 @@ export function fallbackShippingCents(country: Destination["country"]): number {
 }
 
 /**
- * Per-country upcharge (cents, CAD) folded into the shipping line. Covers the sales tax
- * Printful bills us (15% HST in NL, US state tax) so the thinnest destinations stay positive.
- * Sized from npm run verify:live margins, Oct 2026.
+ * Per-country upcharge (cents, CAD) folded into the shipping line. Canada's share is built
+ * into the listed price (Canadian shop: the price you see is the price), so only the US pays
+ * extra. Covers the sales tax Printful bills us. Sized from npm run verify:live, Oct 2026.
  */
 export function countryUpchargeCents(country: Destination["country"]): number {
-  return country === "CA" ? envCents("SHIPPING_UPCHARGE_CA_CENTS", 500) : envCents("SHIPPING_UPCHARGE_US_CENTS", 200);
+  return country === "CA" ? envCents("SHIPPING_UPCHARGE_CA_CENTS", 0) : envCents("SHIPPING_UPCHARGE_US_CENTS", 200);
 }
 
 const cache = new Map<string, { at: number; quote: ShippingQuote }>();

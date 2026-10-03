@@ -77,7 +77,7 @@ export const products: Product[] = [
     blurb: "Pique-knit, black. The face rides quiet until someone gets close enough to read it.",
     accent: "#1233c7",
     free: false,
-    variants: sizedVariants("unisex-pique-polo", "Black", SIZES_APPAREL, 3283, "/img/products/polo.png"),
+    variants: sizedVariants("unisex-pique-polo", "Black", SIZES_APPAREL, 3783, "/img/products/polo.png"),
   },
   {
     id: "unisex-hoodie",
@@ -86,7 +86,7 @@ export const products: Product[] = [
     blurb: "Heavyweight, black. Built for East Van nights, not the studio.",
     accent: "#1233c7",
     free: false,
-    variants: sizedVariants("unisex-hoodie", "Black", SIZES_APPAREL, 4258, "/img/products/hoodie.png"),
+    variants: sizedVariants("unisex-hoodie", "Black", SIZES_APPAREL, 4758, "/img/products/hoodie.png"),
   },
   {
     id: "organic-dad-hat",
@@ -95,7 +95,7 @@ export const products: Product[] = [
     blurb: "Organic cotton, black. Low profile, permanent signal.",
     accent: "#1233c7",
     free: false,
-    variants: sizedVariants("organic-dad-hat", "Black", ONE_SIZE, 3153, "/img/products/dad-hat-black.png"),
+    variants: sizedVariants("organic-dad-hat", "Black", ONE_SIZE, 3653, "/img/products/dad-hat-black.png"),
   },
 ];
 

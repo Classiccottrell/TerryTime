@@ -31,7 +31,7 @@ Receipt** (`/shop/receipt`). Visitors are split 50/50 and never see the other st
 | Ship-to fields | Country · Province/State · Postal code/ZIP code · "Get shipping" · "Change" | |
 | Ship-to errors | Pick Canada or the United States. · Pick a province/state. · Enter a valid postal code, like V5N 4B6. · Enter a valid ZIP code, like 10001. | |
 | Shipping quote line | Shipping {$} · est. {n–m} business days · Total {$} CAD | |
-| Buy button states | Select a size → Add shipping location → Pricing shipping… → Buy — {total} | |
+| Buy button states | Step 1: Select a size → Buy — {price}. Step 2 (ship-to): Add shipping location → Pricing shipping… → Pay — {total} | |
 | Size not linked | That size isn't available right now. Try another or check back soon. | |
 
 > The meta description still says "sticker and merch"; the catalog is apparel only now.
@@ -41,9 +41,9 @@ Receipt** (`/shop/receipt`). Visitors are split 50/50 and never see the other st
 
 | Product | Name | Blurb (current) | Your edit |
 | --- | --- | --- | --- |
-| Polo — $32.83 CAD | Unisex Pique Polo Shirt | Pique-knit, black. The face rides quiet until someone gets close enough to read it. | |
-| Hoodie — $42.58 CAD | Unisex Hoodie | Heavyweight, black. Built for East Van nights, not the studio. | |
-| Dad hat — $31.53 CAD | Organic Dad Hat | Organic cotton, black. Low profile, permanent signal. | |
+| Polo — $37.83 CAD | Unisex Pique Polo Shirt | Pique-knit, black. The face rides quiet until someone gets close enough to read it. | |
+| Hoodie — $47.58 CAD | Unisex Hoodie | Heavyweight, black. Built for East Van nights, not the studio. | |
+| Dad hat — $36.53 CAD | Organic Dad Hat | Organic cotton, black. Low profile, permanent signal. | |
 
 Design credit on every product: "Terry the Sketcher".
 
