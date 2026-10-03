@@ -18,7 +18,9 @@ nothing is lost — it's just not part of this repo anymore.
 `/` and `/shop` run an **A/B split** between the two launch storefronts —
 `/shop/archive` (A, Street Evidence Archive) and `/shop/receipt` (B, Corner Store
 Receipt) — via `middleware.ts`: 50/50, pinned per visitor with a `tt_variant`
-cookie, `?v=a|b` to force one. Each Stripe session records `store` and
+cookie, `?v=a|b` to force one. In dev and Vercel previews a corner switcher
+(`components/DevStoreSwitch.tsx`) jumps between A, B and Lifestyle; it never
+renders in production. Each Stripe session records `store` and
 `ab_variant` metadata. The other five storefront directions (City, Shrine, Grid,
 Stencil, Kiosk) live on the `archive/unused-stores` branch. `/lifestyle` is a
 shoppable lookbook ("After hours") linked from both stores. On a static export
