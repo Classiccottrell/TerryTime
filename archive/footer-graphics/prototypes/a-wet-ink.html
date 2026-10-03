@@ -1,0 +1,129 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A · Wet ink</title>
+<style>html,body{margin:0;height:100%;background:#f7f6f1}canvas{display:block;width:100vw;height:100vh;touch-action:none}</style>
+</head><body><canvas id="c"></canvas>
+<script type="module">
+// A · Wet ink — the engraving rendered in a fragment shader, displaced by a real
+// stable-fluids simulation (advect → divergence → pressure → project). Swipe and the
+// lines smear like wet ink, then dry back into Terry's face. Fast strokes pull a
+// second ink plate out of register (print's version of chromatic aberration).
+import { initGL, program, QUAD_VS, quad, target, faceTexture, loadImage, trackPointer, INK, PAPER, MISREG } from './common.js';
+
+const P = Object.assign({ bands: 72, weight: 7, lift: 0.02, faceScale: 0.78, faceX: 0.5, faceY: 0.5, misreg: 1, simRes: 160, idle: true }, window.__TT || {});
+const canvas = document.getElementById('c');
+const gl = initGL(canvas);
+const draw = quad(gl);
+const pointer = trackPointer(canvas);
+
+const F = (body) => `#version 300 es
+precision highp float; in vec2 vUv; out vec4 o; ${body}`;
+const advect = program(gl, QUAD_VS, F(`uniform sampler2D uVel, uSrc; uniform float dt, dis;
+  void main(){ vec2 c = vUv - dt * texture(uVel, vUv).xy; o = dis * texture(uSrc, c); }`));
+const splat = program(gl, QUAD_VS, F(`uniform sampler2D uSrc; uniform vec2 pt, force; uniform float r, aspect;
+  void main(){ vec2 d = vUv - pt; d.x *= aspect; float g = exp(-dot(d,d) / r); o = texture(uSrc, vUv) + vec4(force * g, 0., 0.); }`));
+const diverge = program(gl, QUAD_VS, F(`uniform sampler2D uVel; uniform vec2 tx;
+  void main(){ float L = texture(uVel, vUv - vec2(tx.x,0)).x, R = texture(uVel, vUv + vec2(tx.x,0)).x,
+    B = texture(uVel, vUv - vec2(0,tx.y)).y, T = texture(uVel, vUv + vec2(0,tx.y)).y;
+    o = vec4(.5 * (R - L + T - B), 0, 0, 1); }`));
+const jacobi = program(gl, QUAD_VS, F(`uniform sampler2D uP, uDiv; uniform vec2 tx;
+  void main(){ float L = texture(uP, vUv - vec2(tx.x,0)).x, R = texture(uP, vUv + vec2(tx.x,0)).x,
+    B = texture(uP, vUv - vec2(0,tx.y)).x, T = texture(uP, vUv + vec2(0,tx.y)).x, d = texture(uDiv, vUv).x;
+    o = vec4((L + R + B + T - d) * .25, 0, 0, 1); }`));
+const project = program(gl, QUAD_VS, F(`uniform sampler2D uP, uVel; uniform vec2 tx;
+  void main(){ float L = texture(uP, vUv - vec2(tx.x,0)).x, R = texture(uP, vUv + vec2(tx.x,0)).x,
+    B = texture(uP, vUv - vec2(0,tx.y)).x, T = texture(uP, vUv + vec2(0,tx.y)).x;
+    o = vec4(texture(uVel, vUv).xy - .5 * vec2(R - L, T - B), 0, 1); }`));
+// Displacement of the printed lines: carried by the flow, pushed by it, and slowly relaxing ("drying").
+const dispStep = program(gl, QUAD_VS, F(`uniform sampler2D uVel, uDisp; uniform float dt, relax, gain;
+  void main(){ vec2 v = texture(uVel, vUv).xy; vec2 d = texture(uDisp, vUv - dt * v).xy;
+    o = vec4(d * relax + v * dt * gain, 0, 1); }`));
+const render = program(gl, QUAD_VS, F(`uniform sampler2D uDisp, uVel, uFace; uniform vec2 res, faceC; uniform float faceS, bands, weight, lift, t, reveal, misreg, dpr;
+  uniform vec3 ink, paper, plate;
+  float face(vec2 p){ vec2 f = (p - faceC) / faceS + .5; if (f.x < 0. || f.y < 0. || f.x > 1. || f.y > 1.) return 0.; return texture(uFace, f).r * reveal; }
+  float inkAt(vec2 p){
+    float gap = res.y / (bands + 1.), acc = 0.;
+    float bi = floor(p.y / gap + .5);
+    for (int k = -1; k <= 1; k++) {
+      float yb = (bi + float(k)) * gap;
+      float h = face(vec2(p.x, yb));
+      float wob = (sin(p.x * .011 / dpr + t * 1.3 + yb * .03) * .6 + sin(p.x * .023 / dpr - t * .9 + yb * .017) * .4) * 3.5 * dpr * (.25 + h);
+      float yc = yb + h * lift + wob;
+      float half_ = (.45 * dpr) + h * h * weight * gap / 6.;
+      acc = max(acc, 1. - smoothstep(half_ - .8, half_ + .8, abs(p.y - yc)));
+    }
+    return acc;
+  }
+  float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+  void main(){
+    vec2 px = gl_FragCoord.xy, uv = px / res;
+    vec2 d = texture(uDisp, uv).xy * res;
+    vec2 v = texture(uVel, uv).xy * res;
+    float a = inkAt(px - d);
+    float b = inkAt(px - d - v * .018 * misreg);      // second plate, dragged by speed
+    float slip = clamp(length(v) * .0025, 0., 1.) * misreg;
+    vec3 col = paper * (1. - .03 * hash(floor(px / (1.5 * dpr))));   // paper tooth
+    col = mix(col, col * plate, b * slip * .85);
+    col = mix(col, ink, a);
+    o = vec4(col, 1.);
+  }`));
+
+let W = 0, H = 0, dpr = 1, sim, pres, div, disp, face;
+function resize() {
+  dpr = Math.min(2, devicePixelRatio || 1);
+  W = Math.round(canvas.clientWidth * dpr); H = Math.round(canvas.clientHeight * dpr);
+  canvas.width = W; canvas.height = H;
+  const sw = P.simRes, sh = Math.max(32, Math.round(P.simRes * H / W));
+  sim = target(gl, sw, sh); pres = target(gl, sw, sh); div = target(gl, sw, sh); disp = target(gl, sw, sh);
+}
+addEventListener('resize', resize); resize();
+
+function pass(prog, out, uniforms) {
+  gl.useProgram(prog.p);
+  let unit = 0;
+  for (const [k, v] of Object.entries(uniforms)) {
+    const loc = prog.u[k]; if (loc == null) continue;
+    if (v && v.tex !== undefined) { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, v.tex); gl.uniform1i(loc, unit++); }
+    else if (v instanceof WebGLTexture) { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, v); gl.uniform1i(loc, unit++); }
+    else if (typeof v === 'number') gl.uniform1f(loc, v);
+    else if (v.length === 2) gl.uniform2fv(loc, v); else if (v.length === 3) gl.uniform3fv(loc, v);
+  }
+  if (out) { gl.bindFramebuffer(gl.FRAMEBUFFER, out.write.fb); gl.viewport(0, 0, out.w, out.h); }
+  else { gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H); }
+  draw();
+  if (out) out.swap();
+}
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let last = performance.now(), start = last, idleT = 0;
+function addSplat(x, y, fx, fy, r = 0.0016) {
+  pass(splat, sim, { uSrc: sim.read.tex, pt: [x / W, y / H], force: [fx / W, fy / H], r, aspect: W / H });
+}
+function frame(now) {
+  const dt = Math.min(1 / 30, (now - last) / 1000); last = now;
+  const t = (now - start) / 1000;
+  const tx = [1 / sim.w, 1 / sim.h];
+  if (pointer.active && (pointer.dx || pointer.dy)) {
+    addSplat(pointer.x * dpr, pointer.y * dpr, pointer.dx * dpr * 9, pointer.dy * dpr * 9);
+    pointer.dx = pointer.dy = 0; idleT = 0;
+  } else if (P.idle && !reduce) {
+    // A slow "ghost hand" keeps the ink breathing when nobody is touching it.
+    idleT += dt;
+    const gx = W * (0.5 + 0.32 * Math.cos(t * 0.31)), gy = H * (0.5 + 0.28 * Math.sin(t * 0.47));
+    addSplat(gx, gy, -Math.sin(t * 0.31) * W * 0.018, Math.cos(t * 0.47) * H * 0.016, 0.003);
+  }
+  pass(advect, sim, { uVel: sim.read.tex, uSrc: sim.read.tex, dt, dis: 0.985 });
+  pass(diverge, div, { uVel: sim.read.tex, tx });
+  for (let i = 0; i < 20; i++) pass(jacobi, pres, { uP: pres.read.tex, uDiv: div.read.tex, tx });
+  pass(project, sim, { uP: pres.read.tex, uVel: sim.read.tex, tx });
+  pass(dispStep, disp, { uVel: sim.read.tex, uDisp: disp.read.tex, dt, relax: 0.965, gain: 1.0 });
+  const s = Math.min(W, H) * P.faceScale;
+  pass(render, null, {
+    uDisp: disp.read.tex, uVel: sim.read.tex, uFace: face.tex, res: [W, H], faceC: [W * P.faceX, H * P.faceY], faceS: s,
+    bands: P.bands, weight: P.weight, lift: Math.min(W, H) * P.lift, t: reduce ? 0 : t * 0.25,
+    reveal: reduce ? 1 : Math.min(1, t / 1.6) ** 2 * (3 - 2 * Math.min(1, t / 1.6)), misreg: P.misreg, dpr, ink: INK, paper: PAPER, plate: MISREG,
+  });
+  if (!reduce) requestAnimationFrame(frame);
+}
+loadImage('face.png').then((img) => { face = faceTexture(gl, img); requestAnimationFrame(frame); });
+window.__splat = (x, y, fx, fy) => addSplat(x * dpr, (canvas.clientHeight - y) * dpr, fx * dpr, -fy * dpr);
+</script></body></html>

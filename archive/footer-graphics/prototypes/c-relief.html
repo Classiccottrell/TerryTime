@@ -1,0 +1,98 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>C · Relief</title>
+<style>html,body{margin:0;height:100%;background:#f7f6f1}canvas{display:block;width:100vw;height:100vh;touch-action:none}</style>
+</head><body><canvas id="c"></canvas>
+<script type="module">
+// C · Relief — the engraving rows become a 3D landscape whose terrain is Terry's face.
+// Seen from straight above it is the flat footer engraving; the pointer tilts the
+// camera so the rows lift into ridges (hidden-line, like a Joy Division plate). On
+// scroll-in the terrain rises from flat lines.
+import { initGL, program, faceTexture, loadImage, trackPointer, INK, PAPER } from './common.js';
+
+const P = Object.assign({ rows: 70, cols: 360, amp: 0.34, idle: true, tilt: null }, window.__TT || {});
+const canvas = document.getElementById('c');
+const gl = initGL(canvas);
+const pointer = trackPointer(canvas);
+
+const prog = program(gl, `#version 300 es
+precision highp float;
+in vec3 a;   // x: u (0..1 across), y: row (0..rows-1), z: side (0 = ribbon low, 1 = ribbon high, 2 = curtain floor)
+uniform sampler2D uFace; uniform mat4 uMVP; uniform vec2 res; uniform float rows, spanX, spanZ, faceS, amp, rise, dpr, weight;
+out float vH; flat out int vKind;
+void main(){
+  float x = (a.x - .5) * spanX, z = (a.y / (rows - 1.) - .5) * spanZ;
+  vec2 fuv = vec2(x / faceS + .5, .5 - z / faceS);
+  float h = (fuv.x > 0. && fuv.x < 1. && fuv.y > 0. && fuv.y < 1.) ? texture(uFace, fuv).r : 0.;
+  vH = h;
+  float y = h * amp * rise;
+  vec4 c = uMVP * vec4(x, a.z > 1.5 ? -.02 : y, z, 1.);
+  if (a.z < 1.5) {
+    // Ribbon thickness is in screen pixels so the line reads at any tilt.
+    float halfPx = (.55 + h * h * weight) * dpr;
+    c.y += (a.z * 2. - 1.) * halfPx / res.y * 2. * c.w;
+    vKind = 0;
+  } else vKind = 1;
+  gl_Position = c;
+}`, `#version 300 es
+precision highp float; in float vH; flat in int vKind; out vec4 o;
+uniform vec3 ink, paper; uniform float fog;
+void main(){ o = vec4(vKind == 0 ? ink : paper, 1.); }`);
+
+// Geometry: per row, a ribbon strip (2 verts per column) and a curtain strip (line → floor).
+const C = P.cols, R = P.rows;
+const ribbon = new Float32Array(R * C * 2 * 3), curtain = new Float32Array(R * C * 2 * 3);
+for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+  const u = c / (C - 1), i = ((r * C + c) * 2) * 3;
+  ribbon.set([u, r, 0, u, r, 1], i);
+  curtain.set([u, r, 0.5, u, r, 2], i);   // 0.5 → treated as the line itself (y = height), 2 → floor
+}
+const vbo = (data) => { const vao = gl.createVertexArray(); gl.bindVertexArray(vao); const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
+  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0); return vao; };
+const ribbonVao = vbo(ribbon), curtainVao = vbo(curtain);
+
+function mat4Mul(a, b) { const o = new Float32Array(16); for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { let s = 0; for (let k = 0; k < 4; k++) s += a[k * 4 + j] * b[i * 4 + k]; o[i * 4 + j] = s; } return o; }
+function perspective(fov, asp, n, f) { const t = 1 / Math.tan(fov / 2); return new Float32Array([t / asp, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) / (n - f), -1, 0, 0, 2 * f * n / (n - f), 0]); }
+function rotX(a) { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1]); }
+function rotY(a) { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1]); }
+function trans(x, y, z) { return new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1]); }
+
+let W = 0, H = 0, dpr = 1, face;
+function resize() { dpr = Math.min(2, devicePixelRatio || 1); W = Math.round(canvas.clientWidth * dpr); H = Math.round(canvas.clientHeight * dpr); canvas.width = W; canvas.height = H; }
+addEventListener('resize', resize); resize();
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let start = performance.now(), tiltX = 1.2, tiltY = 0;
+function frame(now) {
+  const t = (now - start) / 1000;
+  const asp = W / H, spanZ = 2, spanX = spanZ * asp * 1.25, faceS = spanZ * 0.86;
+  // Target tilt: pointer y sets how far we lean over the terrain; x yaws a little. Idle: slow sway.
+  let tx, ty;
+  if (P.tilt) { [tx, ty] = P.tilt; }
+  else if (pointer.active) { tx = 0.15 + (1 - pointer.y / canvas.clientHeight) * 0.85; ty = (pointer.x / canvas.clientWidth - .5) * 0.5; }
+  else { tx = 0.55 + Math.sin(t * 0.35) * 0.25; ty = Math.sin(t * 0.21) * 0.18; }
+  tiltX += (tx - tiltX) * 0.06; tiltY += (ty - tiltY) * 0.06;
+  // tiltX = 0 → looking straight down (flat engraving); larger → leaning in to see the ridges.
+  const view = mat4Mul(trans(0, 0, -2.35), mat4Mul(rotX(Math.PI / 2 - tiltX), rotY(tiltY)));
+  const mvp = mat4Mul(perspective(0.78, asp, 0.1, 20), view);
+  const rise = reduce ? 1 : Math.min(1, t / 2) ** 2 * (3 - 2 * Math.min(1, t / 2));
+
+  gl.viewport(0, 0, W, H);
+  gl.clearColor(...PAPER, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL);
+  gl.useProgram(prog.p);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, face.tex); gl.uniform1i(prog.u.uFace, 0);
+  gl.uniformMatrix4fv(prog.u.uMVP, false, mvp);
+  gl.uniform2f(prog.u.res, W, H); gl.uniform1f(prog.u.rows, R); gl.uniform1f(prog.u.spanX, spanX); gl.uniform1f(prog.u.spanZ, spanZ);
+  gl.uniform1f(prog.u.faceS, faceS); gl.uniform1f(prog.u.amp, P.amp); gl.uniform1f(prog.u.rise, rise); gl.uniform1f(prog.u.dpr, dpr); gl.uniform1f(prog.u.weight, 4.5);
+  gl.uniform3fv(prog.u.ink, INK); gl.uniform3fv(prog.u.paper, PAPER);
+  // Curtains first (paper, occluding what is behind each ridge), then ribbons pulled slightly forward.
+  gl.bindVertexArray(curtainVao);
+  gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(1, 1);
+  for (let r = 0; r < R; r++) gl.drawArrays(gl.TRIANGLE_STRIP, r * C * 2, C * 2);
+  gl.disable(gl.POLYGON_OFFSET_FILL);
+  gl.bindVertexArray(ribbonVao);
+  for (let r = 0; r < R; r++) gl.drawArrays(gl.TRIANGLE_STRIP, r * C * 2, C * 2);
+  if (!reduce) requestAnimationFrame(frame);
+}
+loadImage('face.png').then((img) => { face = faceTexture(gl, img, 256, 2); requestAnimationFrame(frame); });
+</script></body></html>

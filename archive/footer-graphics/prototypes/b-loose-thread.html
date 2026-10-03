@@ -1,0 +1,126 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>B · Loose thread</title>
+<style>html,body{margin:0;height:100%;background:#f7f6f1}canvas{display:block;width:100vw;height:100vh;touch-action:none}</style>
+</head><body><canvas id="c"></canvas>
+<script type="module">
+// B · Loose thread — ~65k GPU-simulated stitches (ping-pong float textures). Each
+// stitch has a home on an engraving row, packed densest where Terry's face is dark.
+// On load they fly in from scatter and sew the face. The pointer is a wind that
+// tears stitches loose along your stroke; springs pull them back. Fast stitches
+// tint toward the red plate, like thread pulled through.
+import { initGL, program, QUAD_VS, quad, target, faceTexture, loadImage, trackPointer, INK, PAPER, MISREG } from './common.js';
+
+const P = Object.assign({ side: 256, bands: 64, faceScale: 0.8, faceX: 0.5, faceY: 0.5, idle: true }, window.__TT || {});
+const canvas = document.getElementById('c');
+const gl = initGL(canvas);
+const draw = quad(gl);
+const pointer = trackPointer(canvas);
+const N = P.side * P.side;
+
+const sim = program(gl, QUAD_VS, `#version 300 es
+precision highp float; in vec2 vUv; out vec4 o;
+uniform sampler2D uState, uHome; uniform vec2 res, ptr, pvel; uniform float dt, t, pr, idle;
+vec2 hash2(vec2 p){ p = vec2(dot(p, vec2(127.1,311.7)), dot(p, vec2(269.5,183.3))); return fract(sin(p) * 43758.5453) * 2. - 1.; }
+float noise(vec2 p){ vec2 i = floor(p), f = fract(p), u = f*f*(3.-2.*f);
+  return mix(mix(dot(hash2(i), f), dot(hash2(i+vec2(1,0)), f-vec2(1,0)), u.x), mix(dot(hash2(i+vec2(0,1)), f-vec2(0,1)), dot(hash2(i+vec2(1,1)), f-vec2(1,1)), u.x), u.y); }
+vec2 curl(vec2 p){ float e = .01; return vec2(noise(p+vec2(0,e)) - noise(p-vec2(0,e)), -(noise(p+vec2(e,0)) - noise(p-vec2(e,0)))) / (2.*e); }
+void main(){
+  vec4 s = texture(uState, vUv), h = texture(uHome, vUv);
+  vec2 pos = s.xy, vel = s.zw;
+  vec2 toHome = h.xy - pos;
+  vec2 acc = toHome * 26.;                                   // spring home
+  vec2 d = pos - ptr; float fall = exp(-dot(d,d) / (pr*pr));
+  acc += pvel * fall * 40.;                                  // dragged along the stroke
+  acc += normalize(d + 1e-4) * length(pvel) * fall * 14.;    // and torn outward
+  acc += curl(pos / res.y * 3. + t * .08) * res.y * (.25 + 1.5 * fall) * (.6 + idle);  // loose fibres drift
+  vel = (vel + acc * dt) * pow(.012, dt);                    // damping
+  o = vec4(pos + vel * dt, vel);
+}`);
+
+const draw3 = program(gl, `#version 300 es
+precision highp float;
+uniform sampler2D uState, uHome; uniform vec2 res; uniform float side, dpr;
+out float vW; out float vSpeed; out float vRand;
+void main(){
+  ivec2 ij = ivec2(gl_VertexID % int(side), gl_VertexID / int(side));
+  vec4 s = texelFetch(uState, ij, 0), h = texelFetch(uHome, ij, 0);
+  vW = h.z; vRand = h.w; vSpeed = length(s.zw);
+  gl_Position = vec4(s.xy / res * 2. - 1., 0, 1);
+  gl_PointSize = (2.5 + h.z * 9.) * dpr;
+}`, `#version 300 es
+precision highp float; in float vW; in float vSpeed; in float vRand; out vec4 o;
+uniform vec3 ink, plate;
+void main(){
+  vec2 c = gl_PointCoord - .5;
+  float th = .07 + vW * .22;                 // stitch thickness grows with face weight
+  if (abs(c.y) > th || abs(c.x) > .5) discard;
+  float slip = clamp(vSpeed * .0011 - .15, 0., 1.);
+  o = vec4(mix(ink, plate, slip * .8), 1.);
+}`);
+
+let W = 0, H = 0, dpr = 1, state, home, face;
+function buildHomes() {
+  // Importance-sample each engraving row: stitches pile up where the face is dark.
+  const s = Math.min(W, H) * P.faceScale, cx = W * P.faceX, cy = H * P.faceY;
+  const F = face.size, fd = face.data;
+  const hAt = (x, y) => { const u = (x - (cx - s / 2)) / s, v = (y - (cy - s / 2)) / s; if (u < 0 || v < 0 || u >= 1 || v >= 1) return 0; return fd[Math.floor(v * F) * F + Math.floor(u * F)]; };
+  const homes = new Float32Array(N * 4), st = new Float32Array(N * 4);
+  const gap = H / (P.bands + 1), per = Math.floor(N / P.bands), cols = 512;
+  let n = 0;
+  for (let b = 1; b <= P.bands && n < N; b++) {
+    const y = b * gap, cdf = new Float32Array(cols); let sum = 0;
+    for (let i = 0; i < cols; i++) { const h = hAt((i + .5) / cols * W, y); sum += 0.25 + h * h * 9; cdf[i] = sum; }
+    const count = b === P.bands ? N - n : per;
+    for (let k = 0; k < count; k++) {
+      const r = (k + Math.random()) / count * sum; let lo = 0, hi = cols - 1;
+      while (lo < hi) { const m = (lo + hi) >> 1; if (cdf[m] < r) lo = m + 1; else hi = m; }
+      const x = (lo + Math.random()) / cols * W, h = hAt(x, y);
+      const i = n * 4;
+      homes[i] = x; homes[i + 1] = y + h * Math.min(W, H) * 0.02 + (Math.random() - .5) * gap * .1 * (1 + h * 2); homes[i + 2] = h * h; homes[i + 3] = Math.random();
+      st[i] = Math.random() * W; st[i + 1] = Math.random() * H; st[i + 2] = 0; st[i + 3] = 0;   // start scattered
+      n++;
+    }
+  }
+  const tex = (data) => { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, P.side, P.side, 0, gl.RGBA, gl.FLOAT, data);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST); return t; };
+  home = tex(homes);
+  state = target(gl, P.side, P.side, { internal: gl.RGBA32F, type: gl.FLOAT, filter: gl.NEAREST });
+  for (const buf of [state.read, state.write]) { gl.bindTexture(gl.TEXTURE_2D, buf.tex); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, P.side, P.side, 0, gl.RGBA, gl.FLOAT, st); }
+}
+function resize() {
+  dpr = Math.min(2, devicePixelRatio || 1);
+  W = Math.round(canvas.clientWidth * dpr); H = Math.round(canvas.clientHeight * dpr);
+  canvas.width = W; canvas.height = H;
+  if (face) buildHomes();
+}
+addEventListener('resize', resize); resize();
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const emptyVao = gl.createVertexArray();
+let last = performance.now(), start = last, pv = [0, 0];
+function frame(now) {
+  const dt = Math.min(1 / 30, (now - last) / 1000); last = now;
+  const t = (now - start) / 1000;
+  // Pointer velocity in px/s, smoothed.
+  const vx = pointer.active ? pointer.dx * dpr / Math.max(dt, 1e-3) : 0, vy = pointer.active ? pointer.dy * dpr / Math.max(dt, 1e-3) : 0;
+  pointer.dx = pointer.dy = 0;
+  pv = [pv[0] * .6 + vx * .4, pv[1] * .6 + vy * .4];
+  gl.useProgram(sim.p);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, state.read.tex); gl.uniform1i(sim.u.uState, 0);
+  gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, home); gl.uniform1i(sim.u.uHome, 1);
+  gl.uniform2f(sim.u.res, W, H); gl.uniform2f(sim.u.ptr, pointer.x * dpr, pointer.y * dpr); gl.uniform2f(sim.u.pvel, pv[0], pv[1]);
+  gl.uniform1f(sim.u.dt, reduce ? 1 : dt); gl.uniform1f(sim.u.t, t); gl.uniform1f(sim.u.pr, Math.min(W, H) * .09); gl.uniform1f(sim.u.idle, P.idle ? 1 : 0);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, state.write.fb); gl.viewport(0, 0, P.side, P.side); draw(); state.swap();
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H);
+  gl.clearColor(...PAPER, 1); gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.useProgram(draw3.p); gl.bindVertexArray(emptyVao);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, state.read.tex); gl.uniform1i(draw3.u.uState, 0);
+  gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, home); gl.uniform1i(draw3.u.uHome, 1);
+  gl.uniform2f(draw3.u.res, W, H); gl.uniform1f(draw3.u.side, P.side); gl.uniform1f(draw3.u.dpr, dpr);
+  gl.uniform3fv(draw3.u.ink, INK); gl.uniform3fv(draw3.u.plate, MISREG);
+  gl.drawArrays(gl.POINTS, 0, N);
+  if (!reduce) requestAnimationFrame(frame);
+}
+loadImage('face.png').then((img) => { face = faceTexture(gl, img, 256, 1); buildHomes(); requestAnimationFrame(frame); });
+</script></body></html>
