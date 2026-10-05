@@ -59,13 +59,6 @@ export async function POST(req: Request) {
         break;
       }
 
-      // Shipping was quoted for the region typed on the site; Stripe only locks the country.
-      const quotedFor = session.metadata?.ship_to;
-      const shippedTo = `${shipping.address.country}-${shipping.address.state}`;
-      if (quotedFor && quotedFor !== shippedTo) {
-        console.warn(`[webhook] ${session.id}: shipping quoted for ${quotedFor} but address is ${shippedTo} — check the Printful cost before confirming.`);
-      }
-
       try {
         const order = await createPrintfulOrder({
           externalId: session.id,

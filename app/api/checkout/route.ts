@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { getStripe, CURRENCY } from "@/lib/stripe";
 import { getVariant, isFulfillable } from "@/lib/products";
 import { routeForPath } from "@/lib/shop-routes.mjs";
-import { parseDestination, type Destination } from "@/lib/regions";
-import { quoteShipping } from "@/lib/shipping";
+import { quoteCheckoutShipping } from "@/lib/shipping";
 
 export const runtime = "nodejs";
 
@@ -42,12 +41,10 @@ export async function POST(req: Request) {
   }
 
   let productId: string | undefined;
-  let destinationInput: unknown;
   let quantity = 1;
   try {
     const body = await req.json();
     productId = body?.productId;
-    destinationInput = body?.destination;
     if (Number.isInteger(body?.quantity) && body.quantity > 0) {
       quantity = Math.min(body.quantity, 20);
     }
@@ -67,12 +64,6 @@ export async function POST(req: Request) {
     );
   }
 
-  const dest = parseDestination(destinationInput);
-  if (!dest.ok) {
-    return NextResponse.json({ error: dest.error }, { status: 400 });
-  }
-  const destination: Destination = dest.destination;
-
   // Fail closed: a variant with no Printful sync id would take payment and then
   // be unfulfillable. ALLOW_UNMAPPED_VARIANTS=true is for Stripe test mode only.
   if (!isFulfillable(variant) && process.env.ALLOW_UNMAPPED_VARIANTS !== "true") {
@@ -85,12 +76,8 @@ export async function POST(req: Request) {
 
   const origin = siteOrigin(req);
   const store = storeFromReferer(req);
-  // Priced server-side from Printful's rate to this address; the client's number is never used.
-  const shipping = await quoteShipping({
-    printfulVariantId: variant.printfulVariantId,
-    quantity,
-    destination,
-  });
+  // Priced server-side from Printful's rates; the client never sends a price.
+  const shipping = await quoteCheckoutShipping(variant.printfulVariantId, quantity);
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -109,8 +96,8 @@ export async function POST(req: Request) {
           },
         },
       ],
-      // Locked to the country they chose (and were quoted for); Stripe collects the full address.
-      shipping_address_collection: { allowed_countries: [destination.country] },
+      // Stripe collects the full address; shipping is one rate covering both countries.
+      shipping_address_collection: { allowed_countries: ["CA", "US"] },
       shipping_options: [
         {
           shipping_rate_data: {
@@ -127,7 +114,6 @@ export async function POST(req: Request) {
         quantity: String(quantity),
         store: store?.shortLabel.toLowerCase() ?? "other",
         ab_variant: store?.variant ?? "none",
-        ship_to: `${destination.country}-${destination.state}`,
         shipping_cents: String(shipping.amountCents),
         shipping_source: shipping.source,
       },

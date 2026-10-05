@@ -19,8 +19,8 @@ export default function ShippingB() {
       <Tape
         items={[
           { q: "Where do you ship?", a: <p>Canada and the US.</p> },
-          { q: "How much is shipping?", a: <p>Whatever it actually costs to get your order to your door. Pop in your postal code on a product and you&apos;ll see the number before you buy. <Tbd>at cost / + buffer / free over $X</Tbd></p> },
-          { q: "How long?", a: <p>About a week to make it (it&apos;s embroidered for you), then a few days in the mail. Your estimate shows up next to the price.</p> },
+          { q: "How much is shipping?", a: <p>What it costs us to get it to you in Canada, plus a little for the US. You&apos;ll see the number at checkout, before you pay. <Tbd>at cost / + buffer / free over $X</Tbd></p> },
+          { q: "How long?", a: <p>About a week to make it (it&apos;s embroidered for you), then a few days in the mail. Your estimate shows at checkout.</p> },
           { q: "Will I pay duties?", a: <p><Tbd>answer once duties are confirmed with Printful</Tbd></p> },
           { q: "Can I return it?", a: <p>Not for a change of heart or the wrong size, sorry. It&apos;s made just for you. Check <Link href="/sizing">sizing</Link> first. <Tbd>exchange policy</Tbd></p> },
           { q: "It arrived wrong or damaged.", a: <p>Send a photo within 30 days and we&apos;ll remake it or refund you. <Tbd>confirm 30 days</Tbd></p> },
