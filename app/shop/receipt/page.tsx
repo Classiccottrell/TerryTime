@@ -6,14 +6,17 @@ import { ProductPurchase } from "@/components/ProductPurchase";
 import { ShopNavigation } from "@/components/ShopNavigation";
 import { SiteLinks } from "@/components/SiteLinks";
 import { TerrySymbols } from "@/components/TerrySymbols";
-import { formatPrice, products, startingPriceCents, type Product } from "@/lib/products";
+import { formatPrice, getCatalog, startingPriceCents, type Product } from "@/lib/catalog";
+
+// Catalog comes from Stripe (lib/catalog.ts); re-read at most every 5 minutes.
+export const revalidate = 300;
+
 
 export const metadata: Metadata = {
   title: "Corner Store Receipt",
   description: "Terry Time goods rung up on one long thermal receipt from East Vancouver.",
 };
 
-const shelfTotalCents = products.reduce((sum, product) => sum + startingPriceCents(product), 0);
 
 function sizeSummary(product: Product) {
   const { variants } = product;
@@ -24,7 +27,9 @@ function sizeSummary(product: Product) {
 // so the stripe pattern is stable across builds without shipping an image.
 const barcodeBars = Array.from("TERRYTIME07CORNERSTORE", (char) => (char.charCodeAt(0) % 4) + 1);
 
-export default function ReceiptShopPage() {
+export default async function ReceiptShopPage() {
+  const products = await getCatalog();
+  const shelfTotalCents = products.reduce((sum, product) => sum + startingPriceCents(product), 0);
   return (
     <main className="shop-design shop-receipt">
       <ShopNavigation current="receipt" />

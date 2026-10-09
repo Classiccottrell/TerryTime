@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getStripe, CURRENCY } from "@/lib/stripe";
-import { getVariant, isFulfillable } from "@/lib/products";
+import { getStripe } from "@/lib/stripe";
+import { CURRENCY, checkPrice, isFulfillable } from "@/lib/catalog-core";
 import { routeForPath } from "@/lib/shop-routes.mjs";
 import { quoteCheckoutShipping } from "@/lib/shipping";
 
@@ -52,21 +52,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const found = productId ? getVariant(productId) : undefined;
-  if (!found) {
+  // productId is a Stripe Price id. Price and product come from Stripe, never the client.
+  if (typeof productId !== "string" || !/^price_[A-Za-z0-9]+$/.test(productId)) {
     return NextResponse.json({ error: "Unknown product." }, { status: 404 });
   }
-  const { product, variant } = found;
-  if (product.free || variant.priceCents <= 0) {
-    return NextResponse.json(
-      { error: "This item is free — just download it." },
-      { status: 400 }
-    );
+  let found: ReturnType<typeof checkPrice>;
+  try {
+    found = checkPrice(await stripe.prices.retrieve(productId, { expand: ["product"] }));
+  } catch {
+    found = { ok: false, status: 404, error: "Unknown product." };
   }
+  if (!found.ok) {
+    return NextResponse.json({ error: found.error }, { status: found.status });
+  }
+  const { product, variant } = found;
 
-  // Fail closed: a variant with no Printful sync id would take payment and then
+  // Fail closed: a Printful item with no sync id would take payment and then
   // be unfulfillable. ALLOW_UNMAPPED_VARIANTS=true is for Stripe test mode only.
-  if (!isFulfillable(variant) && process.env.ALLOW_UNMAPPED_VARIANTS !== "true") {
+  if (!isFulfillable(product, variant) && process.env.ALLOW_UNMAPPED_VARIANTS !== "true") {
     console.error(`[checkout] Refusing ${variant.id}: not linked to Printful (run npm run sync:printful).`);
     return NextResponse.json(
       { error: "That size isn't available right now. Try another or check back soon." },
@@ -77,7 +80,10 @@ export async function POST(req: Request) {
   const origin = siteOrigin(req);
   const store = storeFromReferer(req);
   // Priced server-side from Printful's rates; the client never sends a price.
-  const shipping = await quoteCheckoutShipping(variant.printfulVariantId, quantity);
+  const shipping =
+    product.shippingCents !== undefined
+      ? { amountCents: product.shippingCents, estimate: "5–10", source: "flat" }
+      : await quoteCheckoutShipping(variant.printfulVariantId, quantity);
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -85,13 +91,15 @@ export async function POST(req: Request) {
       line_items: [
         {
           quantity,
-          // Inline price_data so no Stripe dashboard setup is needed — only a key.
+          // Amount from the Stripe catalog Price (variant.id). Inline so the buyer's page and
+          // receipt show the size; the catalog price id is kept in the session metadata.
           price_data: {
             currency: CURRENCY,
             unit_amount: variant.priceCents,
             product_data: {
-              name: `${product.name} — ${variant.color} / ${variant.label}`,
-              description: `${product.voice}`,
+              name: `${product.name} — ${variant.color ? `${variant.color} / ` : ""}${variant.label}`,
+              ...(product.voice && { description: product.voice }),
+              metadata: { stripe_product: product.stripeProductId, stripe_price: variant.id },
             },
           },
         },

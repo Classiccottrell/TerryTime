@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { asset } from "@/lib/site";
 
 /**
  * Terry set in type: the footer / error-page graphic.
@@ -63,7 +62,7 @@ function loadMask(): Promise<Uint8Array> {
       resolve(m);
     };
     img.onerror = reject;
-    img.src = asset("/img/terry-face-drawing.png");
+    img.src = "/img/terry-face-drawing.png";
   });
   return maskPromise;
 }

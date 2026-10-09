@@ -5,7 +5,11 @@ import Link from "next/link";
 import { ProductPurchase } from "@/components/ProductPurchase";
 import { ShopNavigation } from "@/components/ShopNavigation";
 import { SiteLinks } from "@/components/SiteLinks";
-import { products, type Product } from "@/lib/products";
+import { getCatalog } from "@/lib/catalog";
+
+// Catalog comes from Stripe (lib/catalog.ts); re-read at most every 5 minutes.
+export const revalidate = 300;
+
 
 export const metadata: Metadata = {
   title: "Lifestyle",
@@ -63,14 +67,8 @@ function timelinePosition(minutes: number): CSSProperties {
   return { "--at": `${(minutes / TIMELINE_MINUTES) * 100}%` } as CSSProperties;
 }
 
-function getProduct(id: string): Product {
-  const product = products.find((p) => p.id === id);
-  // Fail the build rather than ship a chapter with a missing product.
-  if (!product) throw new Error(`Lifestyle chapter references unknown product "${id}"`);
-  return product;
-}
-
-export default function LifestylePage() {
+export default async function LifestylePage() {
+  const products = await getCatalog();
   return (
     <main className="shop-design shop-lifestyle">
       <ShopNavigation current="lifestyle" />
@@ -107,8 +105,9 @@ export default function LifestylePage() {
       </section>
 
       {chapters.map((chapter, index) => {
-        const product = getProduct(chapter.productId);
-        const variant = product.variants[0];
+        // A product archived in Stripe drops out of its chapter rather than breaking the page.
+        const product = products.find((p) => p.id === chapter.productId);
+        const variant = product?.variants[0];
         return (
           <article
             className={`life-chapter${index % 2 === 1 ? " life-chapter--flip" : ""}`}
@@ -141,6 +140,7 @@ export default function LifestylePage() {
               <h2 id={`${chapter.id}-title`}>{chapter.title}</h2>
               <p>{chapter.body}</p>
 
+              {product && variant && (
               <aside className="life-kit" aria-label={`Kit for ${chapter.time}`}>
                 <p className="shop-kicker">Kit for {chapter.time.toLowerCase()}</p>
                 <div className="life-kit__row">
@@ -160,6 +160,7 @@ export default function LifestylePage() {
                 </div>
                 <ProductPurchase product={product} />
               </aside>
+              )}
             </div>
           </article>
         );

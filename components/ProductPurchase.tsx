@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { BuyButton } from "@/components/BuyButton";
-import type { Product } from "@/lib/products";
+import type { Product } from "@/lib/catalog-core";
 
 export function ProductPurchase({ product }: { product: Product }) {
   const multiple = product.variants.length > 1;
@@ -32,7 +32,7 @@ export function ProductPurchase({ product }: { product: Product }) {
         </fieldset>
       )}
 
-      <BuyButton product={product} variant={variant} />
+      <BuyButton variant={variant} />
     </div>
   );
 }

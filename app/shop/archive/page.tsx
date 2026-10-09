@@ -6,7 +6,11 @@ import { ProductPurchase } from "@/components/ProductPurchase";
 import { ShopNavigation } from "@/components/ShopNavigation";
 import { SiteLinks } from "@/components/SiteLinks";
 import { TerrySymbols } from "@/components/TerrySymbols";
-import { formatPrice, products, startingPriceCents } from "@/lib/products";
+import { formatPrice, getCatalog, startingPriceCents } from "@/lib/catalog";
+
+// Catalog comes from Stripe (lib/catalog.ts); re-read at most every 5 minutes.
+export const revalidate = 300;
+
 
 export const metadata: Metadata = {
   title: "Street Evidence Archive",
@@ -19,7 +23,8 @@ const evidence = [
   ["EV-SKY-003", "/img/shop/skyline-dusk.jpg", "Dusk line, observed from the neighbourhood"],
 ];
 
-export default function ArchiveShopPage() {
+export default async function ArchiveShopPage() {
+  const products = await getCatalog();
   return (
     <main className="shop-design shop-archive">
       <ShopNavigation current="archive" />
