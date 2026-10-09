@@ -6,6 +6,7 @@ import { ProductPurchase } from "@/components/ProductPurchase";
 import { ShopNavigation } from "@/components/ShopNavigation";
 import { SiteLinks } from "@/components/SiteLinks";
 import { getCatalog } from "@/lib/catalog";
+import { ProductImages } from "@/components/ProductImages";
 
 // Catalog comes from Stripe (lib/catalog.ts); re-read at most every 5 minutes.
 export const revalidate = 300;
@@ -141,17 +142,11 @@ export default async function LifestylePage() {
               <p>{chapter.body}</p>
 
               {product && variant && (
-              <aside className="life-kit" aria-label={`Kit for ${chapter.time}`}>
+              <aside className="life-kit" aria-label={`Kit for ${chapter.time}`} data-product>
                 <p className="shop-kicker">Kit for {chapter.time.toLowerCase()}</p>
                 <div className="life-kit__row">
                   <div className="life-kit__image">
-                    <Image
-                      src={variant.image}
-                      alt={product.name}
-                      fill
-                      sizes="120px"
-                      className="object-contain"
-                    />
+                    <ProductImages product={product} sizes="120px" className="object-contain" />
                   </div>
                   <div>
                     <h3>{product.name}</h3>

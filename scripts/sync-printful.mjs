@@ -2,7 +2,9 @@
 /**
  * Links each size of every Printful-fulfilled product in the Stripe catalog to its
  * Printful store sync variant, writing `printful_<size>="<sync>:<catalog>"` into the
- * Stripe product's metadata. Run after adding products or sizes in Stripe/Printful:
+ * Stripe product's metadata (key printful_<colour>_<size>). For non-default colours with no
+ * image_<colour> yet, it also stores Printful's mockup as that colour's photo.
+ * Run after adding products, colours or sizes in Stripe/Printful:
  *
  *   npm run sync:printful            # match + write to Stripe
  *   npm run sync:printful -- --dry   # match + report only
@@ -70,19 +72,25 @@ for (const product of catalog.filter((p) => p.fulfillment === "printful")) {
     const hits = detail.sync_variants.filter((sv) => sizeMatch(sv.size) === sizeMatch(v.size) && norm(sv.color) === norm(v.color));
     if (hits.length !== 1) {
       problems++;
-      console.error(`  ✗ ${v.size}: ${hits.length === 0 ? "no sync variant for this size/colour" : "more than one sync variant matches"}`);
+      console.error(`  ✗ ${v.color} / ${v.size}: ${hits.length === 0 ? "no sync variant for this size/colour" : "more than one sync variant matches"}`);
       continue;
     }
     const { name, rows } = await catalogSizes(hits[0].variant_id, v.color);
     const row = rows.find((r) => sizeMatch(r.size) === sizeMatch(v.size));
     if (!row) {
       problems++;
-      console.error(`  ✗ ${v.size}: Printful's "${name}" in ${v.color} isn't offered in ${v.size}. It offers: ${rows.map((r) => r.size).join(", ") || "(none)"}`);
+      console.error(`  ✗ ${v.color} / ${v.size}: Printful's "${name}" in ${v.color} isn't offered in ${v.size}. It offers: ${rows.map((r) => r.size).join(", ") || "(none)"}`);
       continue;
     }
-    if (row.in_stock === false) console.warn(`  ! ${v.size}: ${name} is OUT OF STOCK at Printful right now`);
-    metadata[`printful_${sizeKey(v.size)}`] = `${hits[0].id}:${hits[0].variant_id}`;
-    console.log(`  ✓ ${v.size} → sync ${hits[0].id} / catalog ${hits[0].variant_id}`);
+    if (row.in_stock === false) console.warn(`  ! ${v.color} / ${v.size}: ${name} is OUT OF STOCK at Printful right now`);
+    metadata[`printful_${sizeKey(v.color)}_${sizeKey(v.size)}`] = `${hits[0].id}:${hits[0].variant_id}`;
+    const raw = ours.find((p) => p.id === product.stripeProductId);
+    const imageKey = `image_${sizeKey(v.color)}`;
+    const mockup = hits[0].files?.find((f) => f.type === "preview")?.preview_url;
+    if (sizeKey(v.color) !== sizeKey(raw?.metadata.color ?? "") && !raw?.metadata[imageKey] && !metadata[imageKey] && mockup) {
+      metadata[imageKey] = mockup;
+    }
+    console.log(`  ✓ ${v.color} / ${v.size} → sync ${hits[0].id} / catalog ${hits[0].variant_id}`);
   }
   if (!dry && Object.keys(metadata).length) await stripe.products.update(product.stripeProductId, { metadata });
 }

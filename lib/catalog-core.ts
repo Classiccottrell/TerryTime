@@ -5,10 +5,15 @@ import type Stripe from "stripe";
  * tagged `metadata.shop = "terrytime"`; each size is an active one-time CAD Price
  * whose nickname (or `metadata.size`) is the size label.
  *
+ * A price's description (nickname) is "Colour / Size" (e.g. "White / M"), or just the size
+ * for the product's default colour (metadata.color).
+ *
  * Product metadata (survives price edits in the dashboard, which create new Price objects):
- *   shop=terrytime · slug · order · color · voice · accent
+ *   shop=terrytime · slug · order · color (default colour) · voice · accent
  *   fulfillment=printful|manual · shipping_cents (optional flat shipping override)
- *   printful_<size key>="<sync variant id>:<catalog variant id>"  e.g. printful_m, printful_one-size
+ *   printful_<colour>_<size>="<sync variant id>:<catalog variant id>"  e.g. printful_white_m
+ *     (printful_<size> is still read for the default colour)
+ *   image_<colour>=URL  photo for a non-default colour (default colour uses the product image)
  *
  * Self-contained (type-only imports) so node --test and scripts/ can import it.
  */
@@ -63,9 +68,22 @@ export function imagePath(url: string | undefined): string {
   }
 }
 
-function printfulIds(product: Stripe.Product, size: string) {
-  const [sync, catalog] = (product.metadata[`printful_${sizeKey(size)}`] ?? "").split(":").map(Number);
+function isDefaultColor(product: Stripe.Product, color: string) {
+  return sizeKey(color) === sizeKey(product.metadata.color ?? "");
+}
+
+function printfulIds(product: Stripe.Product, color: string, size: string) {
+  const m = product.metadata;
+  const raw = m[`printful_${sizeKey(color)}_${sizeKey(size)}`] ?? (isDefaultColor(product, color) ? m[`printful_${sizeKey(size)}`] : undefined);
+  const [sync, catalog] = (raw ?? "").split(":").map(Number);
   return { sync: sync || undefined, catalog: catalog || undefined };
+}
+
+/** "White / M" → { color: "White", size: "M" }; "M" → the product's default colour. */
+function colorAndSize(product: Stripe.Product, price: Stripe.Price) {
+  const raw = price.metadata?.size ? `${price.metadata.color ? `${price.metadata.color} / ` : ""}${price.metadata.size}` : price.nickname ?? "";
+  const [a, b] = raw.split("/").map((x) => x.trim());
+  return b ? { color: a, size: b } : { color: product.metadata.color ?? "", size: a ?? "" };
 }
 
 export function isOurs(product: Stripe.Product | string | Stripe.DeletedProduct | null): product is Stripe.Product {
@@ -74,17 +92,18 @@ export function isOurs(product: Stripe.Product | string | Stripe.DeletedProduct 
 }
 
 function toVariant(product: Stripe.Product, price: Stripe.Price): Variant | null {
-  const size = price.metadata?.size || price.nickname || "";
+  const { color, size } = colorAndSize(product, price);
   if (!size || price.unit_amount == null) return null;
-  const ids = printfulIds(product, size);
+  const ids = printfulIds(product, color, size);
+  const photo = isDefaultColor(product, color) ? undefined : product.metadata[`image_${sizeKey(color)}`];
   return {
     id: price.id,
     label: size,
     size,
-    color: product.metadata.color ?? "",
+    color,
     price: formatPrice(price.unit_amount),
     priceCents: price.unit_amount,
-    image: imagePath(product.images[0]),
+    image: imagePath(photo || product.images[0]),
     printfulVariantId: ids.catalog,
     printfulSyncVariantId: ids.sync,
   };
@@ -96,7 +115,11 @@ function toProduct(product: Stripe.Product, prices: Stripe.Price[]): Product {
       (typeof p.product === "string" ? p.product : p.product.id) === product.id)
     .map((p) => toVariant(product, p))
     .filter((v): v is Variant => v !== null)
-    .sort((a, b) => SIZE_ORDER.indexOf(sizeKey(a.size)) - SIZE_ORDER.indexOf(sizeKey(b.size)) || a.priceCents - b.priceCents);
+    .sort((a, b) =>
+      Number(!isDefaultColor(product, a.color)) - Number(!isDefaultColor(product, b.color)) ||
+      a.color.localeCompare(b.color) ||
+      SIZE_ORDER.indexOf(sizeKey(a.size)) - SIZE_ORDER.indexOf(sizeKey(b.size)) ||
+      a.priceCents - b.priceCents);
   const shipping = Number(product.metadata.shipping_cents);
   return {
     id: product.metadata.slug || product.id,
@@ -123,6 +146,17 @@ export function toCatalog(products: Stripe.Product[], prices: Stripe.Price[]): P
 /** A printful item needs its sync variant (artwork) to be fulfilled; manual items always can. */
 export function isFulfillable(product: Product, variant: Variant): boolean {
   return product.fulfillment === "manual" || Boolean(variant.printfulSyncVariantId);
+}
+
+/** Colours a product comes in, default first. */
+export function colorsOf(product: Product): string[] {
+  return [...new Set(product.variants.map((v) => v.color))];
+}
+
+/** Sizes a product comes in (any colour), in size order. */
+export function sizesOf(product: Product): string[] {
+  const sizes = [...new Set(product.variants.map((v) => v.size))];
+  return sizes.sort((a, b) => SIZE_ORDER.indexOf(sizeKey(a)) - SIZE_ORDER.indexOf(sizeKey(b)));
 }
 
 export function startingPriceCents(product: Product): number {

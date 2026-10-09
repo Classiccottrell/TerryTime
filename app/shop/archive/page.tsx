@@ -6,7 +6,8 @@ import { ProductPurchase } from "@/components/ProductPurchase";
 import { ShopNavigation } from "@/components/ShopNavigation";
 import { SiteLinks } from "@/components/SiteLinks";
 import { TerrySymbols } from "@/components/TerrySymbols";
-import { formatPrice, getCatalog, startingPriceCents } from "@/lib/catalog";
+import { colorsOf, formatPrice, getCatalog, sizesOf, startingPriceCents } from "@/lib/catalog";
+import { ProductImages } from "@/components/ProductImages";
 
 // Catalog comes from Stripe (lib/catalog.ts); re-read at most every 5 minutes.
 export const revalidate = 300;
@@ -68,16 +69,10 @@ export default async function ArchiveShopPage() {
         </div>
         <div className="archive-dossiers">
           {products.map((product, index) => (
-            <article className="archive-dossier" key={product.id}>
+            <article className="archive-dossier" key={product.id} data-product>
               <div className="archive-dossier__number">EXHIBIT<br /><strong>{String(index + 1).padStart(3, "0")}</strong></div>
               <div className="archive-dossier__image">
-                <Image
-                  src={product.variants[0].image}
-                  alt={product.name}
-                  fill
-                  sizes="(max-width: 700px) 90vw, 38vw"
-                  className="object-contain"
-                />
+                <ProductImages product={product} sizes="(max-width: 700px) 90vw, 38vw" className="object-contain" />
               </div>
               <div className="archive-dossier__copy">
                 <p className="shop-kicker">Object / {product.id.replaceAll("-", " ")}</p>
@@ -85,9 +80,9 @@ export default async function ArchiveShopPage() {
                 <dl>
                   <div><dt>Condition</dt><dd>Ready for circulation</dd></div>
                   <div><dt>Marking</dt><dd>Embroidered Terry face</dd></div>
-                  <div><dt>Finish</dt><dd>{product.variants[0].color}</dd></div>
-                  {product.variants.length > 1 && (
-                    <div><dt>Sizes</dt><dd>{product.variants.map((v) => v.label).join(" / ")}</dd></div>
+                  <div><dt>Finish</dt><dd>{colorsOf(product).join(" / ")}</dd></div>
+                  {sizesOf(product).length > 1 && (
+                    <div><dt>Sizes</dt><dd>{sizesOf(product).join(" / ")}</dd></div>
                   )}
                   <div><dt>Value</dt><dd>{formatPrice(startingPriceCents(product))} CAD</dd></div>
                 </dl>

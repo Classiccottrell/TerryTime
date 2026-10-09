@@ -15,10 +15,13 @@ const SITE = "https://www.terryterrylarryberry.com";
 const APPAREL = ["S", "M", "L", "XL"];
 const LAUNCH = [
   { slug: "unisex-pique-polo", order: 1, name: "Unisex Pique Polo Shirt", priceCents: 3783, sizes: APPAREL,
+    more: { White: APPAREL },
     description: "Pique-knit, black. The face rides quiet until someone gets close enough to read it.", image: "/img/products/polo.png" },
   { slug: "unisex-hoodie", order: 2, name: "Unisex Hoodie", priceCents: 4758, sizes: APPAREL,
+    more: { White: ["S", "M", "XL"] }, // add "L" once White L exists in the Printful store
     description: "Heavyweight, black. Built for East Van nights, not the studio.", image: "/img/products/hoodie.png" },
   { slug: "organic-dad-hat", order: 3, name: "Organic Dad Hat", priceCents: 3653, sizes: ["One size"],
+    more: { Oyster: ["One size"] }, // the hat blank has no white; Oyster is its off-white
     description: "Organic cotton, black. Low profile, permanent signal.", image: "/img/products/dad-hat-black.png" },
 ];
 
@@ -39,14 +42,21 @@ for (const item of LAUNCH) {
     });
     console.log(`+ ${item.name} (${product.id})`);
   }
-  for (const size of item.sizes) {
-    const lookup_key = `terrytime_${item.slug}_${size.toLowerCase().replace(/\s+/g, "-")}`;
+  // Default colour (Black): nickname is the size. Other colours: "Colour / Size".
+  const rows = [
+    ...item.sizes.map((size) => ({ color: null, size })),
+    ...Object.entries(item.more ?? {}).flatMap(([color, sizes]) => sizes.map((size) => ({ color, size }))),
+  ];
+  for (const { color, size } of rows) {
+    const key = (x) => x.toLowerCase().replace(/\s+/g, "-");
+    const lookup_key = `terrytime_${item.slug}_${color ? `${key(color)}_` : ""}${key(size)}`;
+    const label = color ? `${color} / ${size}` : size;
     const { data } = await stripe.prices.list({ lookup_keys: [lookup_key] });
-    if (data.length) { console.log(`  = ${size} ${data[0].id}`); continue; }
+    if (data.length) { console.log(`  = ${label} ${data[0].id}`); continue; }
     const price = await stripe.prices.create({
       product: product.id, currency: "cad", unit_amount: item.priceCents,
-      nickname: size, lookup_key, metadata: { size },
+      nickname: label, lookup_key, metadata: color ? { color, size } : { size },
     });
-    console.log(`  + ${size} ${price.id} $${(item.priceCents / 100).toFixed(2)}`);
+    console.log(`  + ${label} ${price.id} $${(item.priceCents / 100).toFixed(2)}`);
   }
 }

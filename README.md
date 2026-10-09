@@ -42,7 +42,10 @@ shoppable lookbook ("After hours") linked from both stores. Hosted on Vercel onl
   `metadata.shop = terrytime` plus `slug`, `order`, `color`, `voice`,
   `fulfillment` (`printful` | `manual`) and optional `shipping_cents`; each size
   is an active one-time CAD Price whose **description (nickname) is the size**
-  (`S`, `M`, `One size`). Products without the tag (other projects in the same
+  (`S`, `M`, `One size`) for the default colour (`metadata.color`), or
+  **`Colour / Size`** (`White / M`) for other colours; the product card then
+  shows a colour picker and swaps the photo (`image_<colour>` metadata,
+  filled with Printful's mockup by `sync:printful` until you upload a photo). Products without the tag (other projects in the same
   Stripe account) are ignored. `npm run import:catalog` seeds the launch
   products into a fresh account (idempotent — use it for live mode).
 - **Checkout** receives only a Stripe Price id; the server re-reads the price
@@ -52,7 +55,7 @@ shoppable lookbook ("After hours") linked from both stores. Hosted on Vercel onl
   cancel → `/shop?canceled=1`.
 - **Printful** — the Terry Store on Printful (store ID `18616880`). `npm run
   sync:printful` links each size of every `fulfillment=printful` product to its
-  Printful sync variant, writing `printful_<size>="<sync>:<catalog>"` into the
+  Printful sync variant, writing `printful_<colour>_<size>="<sync>:<catalog>"` into the
   Stripe product metadata; unlinked sizes can't be bought.
   `PRINTFUL_API_KEY` lives in `.env.local` (gitignored) and on Vercel.
 - **Manual products** (not print on demand): set `fulfillment=manual` (and
