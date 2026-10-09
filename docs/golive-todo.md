@@ -8,12 +8,13 @@ Companion docs: `launch-roadmap.md` (timeline and marketing), `copy-deck.md` (te
 ## A. Blockers: nothing can be sold until these are done
 
 - [ ] **Merge PR #11** into main (A/B stores, sizes, favicon, tooling). — You
-- [ ] **Deploy to a server host, not GitHub Pages.** Vercel already builds previews; point the production domain at it. Checkout, the webhook and the A/B middleware need a server. — You
-- [ ] **Add env vars on the host:** `PRINTFUL_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_SITE_URL=https://terryterrylarryberry.com` (Production scope only, so preview deploys don't redirect Stripe to the live domain), `RESEND_API_KEY` + `RESEND_AUDIENCE_ID`. Start with **Stripe test keys**. — You
+- [x] **Deploy to a server host, not GitHub Pages.** Vercel serves terryterrylarryberry.com; the GitHub Pages copy and its workflow were removed Oct 8. — Done
+- [x] **Catalog in Stripe.** Products and prices live in the Stripe Product catalog (sandbox "ClassicCottrell sandbox" seeded Oct 8 by `npm run import:catalog`: polo/hoodie S–XL, hat). Edit them in the dashboard; the site picks changes up within 5 minutes. Each price's description must be its size. For live mode, run `npm run import:catalog` then `npm run sync:printful` with the live key. — Done (test mode)
+- [x] **Env vars on Vercel:** `STRIPE_SECRET_KEY` (Vercel–Stripe integration, sandbox), `STRIPE_WEBHOOK_SECRET` (Production, endpoint "charismatic-victory"), `PRINTFUL_API_KEY`, `NEXT_PUBLIC_SITE_URL`. Still to do: newsletter keys; scope `NEXT_PUBLIC_SITE_URL` to Production only; swap to live keys at launch. — Done (test mode)
 - [ ] **Create every size in the Printful store.** The Terry Store needs Polo S–XL, Hoodie S–XL and Dad Hat (one size) as sync products with the Terry face artwork on each. Product names must contain "Pique Polo", "Hoodie" and "Dad Hat". — You
-- [x] **Run `npm run sync:printful`** (done Oct 2: all 9 variants linked), commit the generated `lib/printful-map.mjs`. Until then every size is unsellable (checkout refuses with "That size isn't available"). It also checks Printful's own blank is made in each size (and in stock). Any ✗ is a naming problem in your store or a size the blank doesn't come in, which means that size has to be dropped from `SIZES_APPAREL` in `lib/products.ts`. — Claude + You
+- [x] **Run `npm run sync:printful`** (Oct 8: all 9 sizes linked; ids now live in the Stripe product metadata). Re-run after adding a Printful product or size in Stripe. Any ✗ is a naming mismatch between the Stripe and Printful product names, or a size the blank doesn't come in.
 - [ ] **Run `npm run verify:live`** and get zero FAIL. It checks auth, every size is linked, stock, per-size margin, a test Checkout Session, and the webhook. — Claude + You
-- [ ] **Register the Stripe webhook** at `https://<domain>/api/webhook` for `checkout.session.completed`, put the signing secret in `STRIPE_WEBHOOK_SECRET`. — You
+- [x] **Stripe webhook registered** (sandbox): `https://www.terryterrylarryberry.com/api/webhook`, `checkout.session.completed`, secret on Vercel; verified with a signed test event Oct 8. Old ClassicCottrellShop endpoint disabled. Redo for live mode. — Done (test mode)
 
 ## B. Money: get these right before real customers
 

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 /**
  * Shows a "checkout canceled" notice when Stripe redirects back with
  * ?canceled. Read on the client so the shop page stays statically
- * prerenderable (static export has no request-time searchParams).
+ * prerenderable (no request-time searchParams).
  */
 export function CanceledBanner() {
   const [canceled, setCanceled] = useState(false);

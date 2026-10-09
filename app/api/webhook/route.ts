@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createPrintfulOrder } from "@/lib/printful";
-import { getVariant } from "@/lib/products";
+import { describePrice } from "@/lib/catalog-core";
 
 export const runtime = "nodejs";
 
@@ -47,10 +47,21 @@ export async function POST(req: Request) {
         break;
       }
 
-      // Look the variant up server-side rather than trusting ids echoed in metadata.
-      const found = getVariant(session.metadata?.variantId ?? "");
-      const printfulSyncVariantId = found?.variant.printfulSyncVariantId;
+      // What was bought, from the Stripe catalog (archived prices included: the buyer may have
+      // paid just before a dashboard price edit). variantId is the catalog Price id our server set.
+      let found: ReturnType<typeof describePrice> = null;
+      try {
+        found = describePrice(await stripe.prices.retrieve(session.metadata?.variantId ?? "", { expand: ["product"] }));
+      } catch (err) {
+        console.error(`[webhook] Couldn't load the catalog price for ${session.id}:`, err);
+      }
       const shipping = session.collected_information?.shipping_details;
+
+      if (found?.product.fulfillment === "manual") {
+        console.log(`[webhook] ${session.id}: ${found.product.name} / ${found.variant.label} — fulfil manually (not a Printful item).`);
+        break;
+      }
+      const printfulSyncVariantId = found?.variant.printfulSyncVariantId;
 
       if (!found || !printfulSyncVariantId || !shipping?.address) {
         console.error(

@@ -1,30 +1,19 @@
 #!/usr/bin/env node
 /**
- * Links every local size variant (lib/products.ts) to its Printful store sync
- * variant and writes lib/printful-map.mjs. Run after adding products or sizes
- * to the Printful store:
+ * Links each size of every Printful-fulfilled product in the Stripe catalog to its
+ * Printful store sync variant, writing `printful_<size>="<sync>:<catalog>"` into the
+ * Stripe product's metadata. Run after adding products or sizes in Stripe/Printful:
  *
- *   npm run sync:printful            # match + write lib/printful-map.mjs
+ *   npm run sync:printful            # match + write to Stripe
  *   npm run sync:printful -- --dry   # match + report only
  *
- * Matching: a store product matches a local product when every word of the
- * local name (ignoring "unisex") appears in the store product's name; a sync
- * variant then matches a local size by its `size` field (S, M, L, XL; "One
- * size" accepts "OS" / "One size") and the colour by its `color` field.
- * It also confirms Printful's own blank is offered (and in stock) in each size,
- * so a size we list but the blank doesn't make is caught here.
- * Anything ambiguous or unmatched is reported and left out — it stays
- * unsellable rather than guessed.
+ * Matching: a Printful store product matches when every word of the Stripe product
+ * name (ignoring "unisex") appears in its name; a sync variant then matches by size
+ * ("One size" accepts "OS") and colour (product metadata.color). It also confirms
+ * Printful's own blank is offered (and in stock) in each size. Anything ambiguous or
+ * unmatched is reported and left unlinked — it stays unsellable rather than guessed.
  */
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
-
-for (const file of [".env.local", ".env"]) {
-  if (!existsSync(file)) continue;
-  for (const line of readFileSync(file, "utf8").split("\n")) {
-    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
-    if (m && !(m[1] in process.env)) process.env[m[1]] = m[2].replace(/^['"]|['"]$/g, "");
-  }
-}
+import { stripeClient, loadCatalog } from "./_shared.mjs";
 
 const dry = process.argv.includes("--dry");
 const API = process.env.PRINTFUL_API_BASE ?? "https://api.printful.com";
@@ -45,33 +34,30 @@ async function pf(path) {
 
 const words = (s) => s.toLowerCase().replace(/unisex/g, "").split(/[^a-z0-9]+/).filter(Boolean);
 const norm = (s) => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
-const sizeKey = (s) => {
+const sizeMatch = (s) => {
   const n = norm(s);
   return n === "os" || n === "onesize" || n === "onesizefitsall" ? "onesize" : n;
 };
 
-const { products } = await import("../lib/products.ts");
+const { sizeKey } = await import("../lib/catalog-core.ts");
+const stripe = await stripeClient();
+const { ours, catalog } = await loadCatalog(stripe);
 const storeProducts = await pf("/store/products?limit=100");
-const map = {};
-let problems = 0;
 const catalogCache = new Map();
+let problems = 0;
 
 /** Sizes Printful actually offers for this blank in this colour (catalog, not our store). */
 async function catalogSizes(catalogVariantId, color) {
   const variant = await pf(`/products/variant/${catalogVariantId}`);
   const productId = variant.variant.product_id;
   if (!catalogCache.has(productId)) catalogCache.set(productId, await pf(`/products/${productId}`));
-  const catalog = catalogCache.get(productId);
-  const rows = catalog.variants.filter((v) => norm(v.color) === norm(color));
-  return { name: catalog.product.title, rows };
+  const cat = catalogCache.get(productId);
+  return { name: cat.product.title, rows: cat.variants.filter((v) => norm(v.color) === norm(color)) };
 }
 
-for (const product of products) {
+for (const product of catalog.filter((p) => p.fulfillment === "printful")) {
   const need = words(product.name);
-  const candidates = storeProducts.filter((sp) => {
-    const have = new Set(words(sp.name));
-    return need.every((w) => have.has(w));
-  });
+  const candidates = storeProducts.filter((sp) => need.every((w) => new Set(words(sp.name)).has(w)));
   if (candidates.length !== 1) {
     problems++;
     console.error(`✗ ${product.name}: ${candidates.length === 0 ? "no matching Printful store product" : `ambiguous — ${candidates.map((c) => c.name).join(" | ")}`}`);
@@ -79,42 +65,31 @@ for (const product of products) {
   }
   const detail = await pf(`/store/products/${candidates[0].id}`);
   console.log(`• ${product.name} ⇄ "${candidates[0].name}" (${detail.sync_variants.length} variants)`);
-
+  const metadata = {};
   for (const v of product.variants) {
-    const hits = detail.sync_variants.filter(
-      (sv) => sizeKey(sv.size) === sizeKey(v.size) && norm(sv.color) === norm(v.color),
-    );
+    const hits = detail.sync_variants.filter((sv) => sizeMatch(sv.size) === sizeMatch(v.size) && norm(sv.color) === norm(v.color));
     if (hits.length !== 1) {
       problems++;
-      console.error(`  ✗ ${v.id}: ${hits.length === 0 ? "no sync variant for this size/colour" : "more than one sync variant matches"}`);
+      console.error(`  ✗ ${v.size}: ${hits.length === 0 ? "no sync variant for this size/colour" : "more than one sync variant matches"}`);
       continue;
     }
-    // The blank itself must come in this size and be in stock, not just our store listing.
     const { name, rows } = await catalogSizes(hits[0].variant_id, v.color);
-    const row = rows.find((r) => sizeKey(r.size) === sizeKey(v.size));
+    const row = rows.find((r) => sizeMatch(r.size) === sizeMatch(v.size));
     if (!row) {
       problems++;
-      console.error(`  ✗ ${v.id}: Printful's "${name}" in ${v.color} isn't offered in ${v.size}. It offers: ${rows.map((r) => r.size).join(", ") || "(none)"}`);
+      console.error(`  ✗ ${v.size}: Printful's "${name}" in ${v.color} isn't offered in ${v.size}. It offers: ${rows.map((r) => r.size).join(", ") || "(none)"}`);
       continue;
     }
-    if (row.in_stock === false) console.warn(`  ! ${v.id}: ${name} ${v.size} is OUT OF STOCK at Printful right now`);
-    map[v.id] = { sync: hits[0].id, catalog: hits[0].variant_id };
-    console.log(`  ✓ ${v.id} → sync ${hits[0].id} / catalog ${hits[0].variant_id}`);
+    if (row.in_stock === false) console.warn(`  ! ${v.size}: ${name} is OUT OF STOCK at Printful right now`);
+    metadata[`printful_${sizeKey(v.size)}`] = `${hits[0].id}:${hits[0].variant_id}`;
+    console.log(`  ✓ ${v.size} → sync ${hits[0].id} / catalog ${hits[0].variant_id}`);
   }
+  if (!dry && Object.keys(metadata).length) await stripe.products.update(product.stripeProductId, { metadata });
 }
 
-const out = `/**
- * Local variant id → Printful ids. GENERATED by \`npm run sync:printful\`
- * (reads the Terry Store's sync variants and matches them by product and size).
- * Do not hand-edit. Variants missing here cannot be bought: checkout refuses
- * them, because an order without a Printful sync variant has no print files.
- */
-export const printfulMap = ${JSON.stringify(map, null, 2)};
-`;
-if (dry) console.log("\n--dry: not writing lib/printful-map.mjs");
-else {
-  writeFileSync(new URL("../lib/printful-map.mjs", import.meta.url), out);
-  console.log(`\nWrote lib/printful-map.mjs (${Object.keys(map).length} variants linked).`);
+const printful = catalog.filter((p) => p.fulfillment === "printful").length;
+console.log(`\n${dry ? "Dry run: nothing written." : "Wrote Printful ids to Stripe product metadata."} ${printful} Printful product(s) of ${ours.length} TerryTime product(s) in Stripe.`);
+if (problems) {
+  console.error(`${problems} problem(s): those sizes stay unsellable until fixed.`);
+  process.exit(1);
 }
-console.log(problems ? `${problems} problem(s): those variants stay unsellable until fixed.` : "All variants linked.");
-process.exit(problems ? 1 : 0);

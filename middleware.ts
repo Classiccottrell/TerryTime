@@ -7,8 +7,7 @@ import { VARIANT_COOKIE, routeForVariant } from "@/lib/shop-routes.mjs";
  * they keep seeing the same store. `?v=a|b` forces a variant (for previews and
  * paid-social links that must land on a specific store).
  *
- * Server-only: the static GitHub Pages export drops this file (see the
- * deploy workflow) and `/` + `/shop` fall back to a plain redirect to Archive.
+ * `/` + `/shop` pages are only a fallback redirect to Archive if middleware doesn't run.
  */
 export function middleware(req: NextRequest) {
   const { searchParams } = req.nextUrl;

@@ -56,7 +56,7 @@ const cache = new Map<string, { at: number; quote: ShippingQuote }>();
 const CACHE_MS = 10 * 60 * 1000;
 
 export async function quoteShipping(params: {
-  /** Printful catalog variant id (from lib/printful-map). Without it we can only use the fallback. */
+  /** Printful catalog variant id (Stripe product metadata, see lib/catalog-core). Without it we can only use the fallback. */
   printfulVariantId?: number;
   quantity: number;
   destination: Destination;

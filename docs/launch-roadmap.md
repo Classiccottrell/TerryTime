@@ -20,7 +20,7 @@ Cyber Monday Nov 30. Confirm Printful's holiday shipping cutoffs in the dashboar
 | --- | --- | --- |
 | Review + merge the launch-ab-stores PR | You | Merged to main |
 | Add `PRINTFUL_API_KEY`, `STRIPE_SECRET_KEY` (test), `STRIPE_WEBHOOK_SECRET` to the host | You | `npm run verify:live` has no FAIL |
-| Run `npm run verify:live -- --discover`, paste `printfulSyncVariantId` into `lib/products.ts` | Claude + you | Orders created from sync variants |
+| Products in the Stripe catalog, linked to Printful with `npm run sync:printful` (ids in Stripe product metadata) | Claude + you | Orders created from sync variants |
 | Check margin output (retail + shipping vs Printful cost) | You | Every SKU margin > 0 after Stripe fees (2.9% + 30¢) |
 | Run `verify:live` and review the live shipping charged vs. Printful cost per region | You | Shipping covers cost |
 | Order one of each sample, shot-list ready | You | Samples in hand |

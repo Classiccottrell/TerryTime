@@ -10,15 +10,7 @@
  * Reads PRINTFUL_API_KEY / STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET from the
  * environment or .env.local. Never prints secrets. Exits non-zero on any FAIL.
  */
-import { readFileSync, existsSync } from "node:fs";
-
-for (const file of [".env.local", ".env"]) {
-  if (!existsSync(file)) continue;
-  for (const line of readFileSync(file, "utf8").split("\n")) {
-    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
-    if (m && !(m[1] in process.env)) process.env[m[1]] = m[2].replace(/^['"]|['"]$/g, "");
-  }
-}
+import { stripeClient, loadCatalog } from "./_shared.mjs";
 
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
@@ -32,7 +24,15 @@ const record = (status, name, detail = "") => {
   console.log(`${status.padEnd(5)} ${name}${detail ? ` — ${detail}` : ""}`);
 };
 
-const { products } = await import("../lib/products.ts");
+// The catalog lives in Stripe (lib/catalog-core.ts). Empty if Stripe isn't configured.
+let products = [];
+let rawCatalog = { ours: [], prices: [] };
+try {
+  rawCatalog = await loadCatalog(await stripeClient());
+  products = rawCatalog.catalog;
+} catch (e) {
+  console.log(`(catalog not loaded: ${e.message})`);
+}
 const { quoteCheckoutShipping } = await import("../lib/shipping.ts");
 const DESTINATIONS = [
   { name: "Vancouver, BC", destination: { country: "CA", state: "BC", postalCode: "V5N 4B6" },
@@ -85,18 +85,23 @@ async function printful() {
     }
   }
   if (flag("--discover")) {
-    console.log("\nStore sync variants (copy `printfulSyncVariantId` into lib/products.ts):");
+    console.log("\nStore sync variants (npm run sync:printful links them to the Stripe catalog):");
     for (const sv of syncVariants) {
       console.log(`  sync_variant_id=${sv.id}  catalog_variant_id=${sv.variant_id}  ${sv.name}  retail=${sv.retail_price}`);
     }
     console.log("");
   }
 
-  for (const product of products) {
+  if (!products.length) record("FAIL", "Stripe catalog", "no TerryTime products — run npm run import:catalog");
+  for (const p of rawCatalog.ours.filter((p) => p.active)) {
+    const unlabeled = rawCatalog.prices.filter((pr) => (typeof pr.product === "string" ? pr.product : pr.product.id) === p.id && !(pr.metadata?.size || pr.nickname));
+    if (unlabeled.length) record("FAIL", `${p.name}: size label on every price`, `${unlabeled.length} active price(s) without a nickname/size — hidden from the shop. Set the price description to the size (e.g. "M").`);
+  }
+  for (const product of products.filter((p) => p.fulfillment === "printful")) {
     for (const v of product.variants) {
       const label = `${product.name} / ${v.color} / ${v.label}`;
       if (!v.printfulSyncVariantId) {
-        record("FAIL", `${label}: linked to Printful`, "no sync variant in lib/printful-map.mjs — run npm run sync:printful");
+        record("FAIL", `${label}: linked to Printful`, "no Printful ids in the Stripe product metadata — run npm run sync:printful");
         continue;
       }
       const sv = syncVariants.find((s) => s.id === v.printfulSyncVariantId);
