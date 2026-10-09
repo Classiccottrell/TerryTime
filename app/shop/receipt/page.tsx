@@ -6,7 +6,8 @@ import { ProductPurchase } from "@/components/ProductPurchase";
 import { ShopNavigation } from "@/components/ShopNavigation";
 import { SiteLinks } from "@/components/SiteLinks";
 import { TerrySymbols } from "@/components/TerrySymbols";
-import { formatPrice, getCatalog, startingPriceCents, type Product } from "@/lib/catalog";
+import { colorsOf, formatPrice, getCatalog, sizesOf, startingPriceCents, type Product } from "@/lib/catalog";
+import { ProductImages } from "@/components/ProductImages";
 
 // Catalog comes from Stripe (lib/catalog.ts); re-read at most every 5 minutes.
 export const revalidate = 300;
@@ -19,8 +20,8 @@ export const metadata: Metadata = {
 
 
 function sizeSummary(product: Product) {
-  const { variants } = product;
-  return variants.length === 1 ? "" : ` / ${variants[0].label}–${variants[variants.length - 1].label}`;
+  const sizes = sizesOf(product);
+  return sizes.length === 1 ? "" : ` / ${sizes[0]}–${sizes[sizes.length - 1]}`;
 }
 
 // Deterministic barcode: bar widths come from the store code's char codes,
@@ -75,7 +76,7 @@ export default async function ReceiptShopPage() {
               {products.map((product, index) => {
                 const variant = product.variants[0];
                 return (
-                  <li className="receipt-item" key={product.id}>
+                  <li className="receipt-item" key={product.id} data-product>
                     <div className="receipt-line">
                       <span>{String(index + 1).padStart(2, "0")}</span>
                       <h3>{product.name}</h3>
@@ -83,16 +84,10 @@ export default async function ReceiptShopPage() {
                       <span>{formatPrice(startingPriceCents(product))}</span>
                     </div>
                     <div className="receipt-item__image">
-                      <Image
-                        src={variant.image}
-                        alt={product.name}
-                        fill
-                        sizes="(max-width: 760px) 80vw, 360px"
-                        className="object-contain"
-                      />
+                      <ProductImages product={product} sizes="(max-width: 760px) 80vw, 360px" className="object-contain" />
                     </div>
                     <p className="receipt-item__meta">
-                      {variant.color}{sizeSummary(product)} / Design: {product.voice}
+                      {colorsOf(product).join(", ")}{sizeSummary(product)} / Design: {product.voice}
                     </p>
                     <p className="receipt-item__blurb">{product.blurb}</p>
                     <ProductPurchase product={product} />
